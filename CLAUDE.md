@@ -27,6 +27,7 @@
 | `docs/9-erd.md` | ERD(mermaid) |
 | `docs/9-schema.sql` | PostgreSQL DDL(ERD 기반) |
 | `docs/10-plan.md` | DB/BE/FE 실행 계획(Task, 선행관계, 완료조건 체크박스) |
+| `docs/11-pet-state-diagram.md` | 펫 상태(stage/mood/eggState) 및 행동별 효과 다이어그램(mermaid) |
 | `docs/swagger.json` | OpenAPI 3.0 API 스펙 |
 
 문서 간 불일치가 생기면(파일 경로 변경, 규칙 변경 등) 관련된 다른 문서도 함께 수정할 것.

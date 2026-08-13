@@ -1,6 +1,6 @@
 # 기술 아키텍처 다이어그램: b2b-promo
 
-기반 문서: `docs/4-PRD.md`(4장 기술 스택), `docs/6-project-principle.md`(6장 프론트/7장 백엔드 레이어)
+기반 문서: `docs/3-PRD.md`(4장 기술 스택), `docs/6-project-principle.md`(6장 프론트/7장 백엔드 레이어)
 전제: 1인 개발, 3일 일정, 오버엔지니어링 금지 — 문서에 없는 인프라(로드밸런서, 캐시 서버, 메시지 큐 등)는 그리지 않는다.
 
 ```mermaid

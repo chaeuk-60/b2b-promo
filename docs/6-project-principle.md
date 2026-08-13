@@ -1,6 +1,6 @@
 # 프로젝트 구조 설계 원칙: b2b-promo
 
-기반 문서: `docs/1-domain-definition.md`, `docs/2-pet-design-guide.md`, `docs/3-use-case-diagram.md`, `docs/4-PRD.md`, `docs/5-user-scenarios.md`
+기반 문서: `docs/1-domain-definition.md`, `docs/2-pet-design-guide.md`, `docs/3-PRD.md`, `docs/4-use-case-diagram.md`, `docs/5-user-scenarios.md`
 전제: 1인 개발, 3일 일정, 오버엔지니어링 금지(CLAUDE.md 최우선 지침)
 
 ---

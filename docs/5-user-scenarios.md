@@ -1,7 +1,7 @@
 # 사용자 시나리오: b2b-promo
 
 ## 문서 정보
-- 기반 문서: `docs/1-domain-definition.md`, `docs/4-PRD.md`
+- 기반 문서: `docs/1-domain-definition.md`, `docs/3-PRD.md`
 - 목적: 두 문서에 정의된 규칙만으로 실제 사용 흐름을 시간 순서로 정리(추적용). 새 기능 창작 없음.
 - 참고: PRD 9절에 따라 페르소나별 상세 시나리오는 다루지 않고, 기능 흐름만 담백하게 기술함.
 

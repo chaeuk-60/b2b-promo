@@ -96,12 +96,12 @@
           "mood": {
             "type": "string",
             "nullable": true,
-            "enum": ["더러움", "배고픔", "삐짐", "평범", "행복", "무지개", "반짝이", "특식 요청"]
+            "enum": ["더러움", "배고픔", "삐짐", "평범", "행복", "반짝이", "무지개", "특식 요청"]
           },
           "egg_state": {
             "type": "string",
             "nullable": true,
-            "enum": ["평범", "더러움", "반질반질", "무지개", "반짝이", "특식 요청"]
+            "enum": ["평범", "더러움", "반질반질", "반짝이", "무지개", "특식 요청"]
           },
           "requested_promotion_id": { "type": "integer", "format": "int64", "nullable": true },
           "activity_count": { "type": "integer" },
@@ -498,7 +498,7 @@
       "post": {
         "tags": ["pet"],
         "summary": "펫 특식 주기",
-        "description": "보유 중인 특식(신청 완료한 프로모션 기준)이 1개 이상일 때만 가능하며, 여러 개 보유 시 급여할 프로모션을 지정한다. mood/eggState가 '특식 요청'이고 대상(requestedPromotionId)과 일치하면 반짝이로 변화. 그 외 자발적 급여는 50% 확률로 진화, 50% 확률로 무지개로 변화(둘 중 하나는 항상 발생). '밥'과는 완전히 분리된 별도 엔드포인트다.",
+        "description": "보유 중인 특식(신청 완료한 프로모션 기준)이 1개 이상일 때만 가능하며, 여러 개 보유 시 급여할 프로모션을 지정한다. mood/eggState가 '특식 요청'이고 대상(requestedPromotionId)과 일치하면 무지개로 변화. 그 외 자발적 급여는 50% 확률로 진화, 50% 확률로 반짝이로 변화(둘 중 하나는 항상 발생). '밥'과는 완전히 분리된 별도 엔드포인트다.",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,

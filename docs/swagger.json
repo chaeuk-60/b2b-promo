@@ -1,0 +1,568 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "b2b-promo API",
+    "description": "회사 프로모션 신청/찜 및 펫(다마고치) 육성 기능을 제공하는 API. docs/1-domain-definition.md, docs/3-PRD.md, docs/10-plan.md(BE-1~BE-8) 기준.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "/api" }
+  ],
+  "tags": [
+    { "name": "auth", "description": "회원가입/로그인/토큰" },
+    { "name": "promotion", "description": "프로모션 조회/등록/신청/찜" },
+    { "name": "application", "description": "나의 신청 목록" },
+    { "name": "pet", "description": "펫 조회/육성" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "액세스 토큰(15분 만료)을 Authorization: Bearer 헤더로 전달"
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "email": { "type": "string" },
+          "password_hash": { "type": "string" }
+        }
+      },
+      "RefreshToken": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "user_id": { "type": "integer", "format": "int64" },
+          "token_hash": { "type": "string" },
+          "expires_at": { "type": "string", "format": "date-time" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Promotion": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "title": { "type": "string" },
+          "start_date": { "type": "string", "format": "date" },
+          "end_date": { "type": "string", "format": "date" },
+          "content": { "type": "string" },
+          "special_food_id": { "type": "string" }
+        }
+      },
+      "Application": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "user_id": { "type": "integer", "format": "int64" },
+          "promotion_id": { "type": "integer", "format": "int64" },
+          "applied_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Favorite": {
+        "type": "object",
+        "properties": {
+          "user_id": { "type": "integer", "format": "int64" },
+          "promotion_id": { "type": "integer", "format": "int64" }
+        }
+      },
+      "Pet": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "user_id": { "type": "integer", "format": "int64" },
+          "name": { "type": "string", "nullable": true },
+          "stage": {
+            "type": "string",
+            "enum": ["알", "새끼", "성체", "묘비"]
+          },
+          "mood": {
+            "type": "string",
+            "nullable": true,
+            "enum": ["더러움", "배고픔", "삐짐", "평범", "행복", "무지개", "반짝이", "특식 요청"]
+          },
+          "egg_state": {
+            "type": "string",
+            "nullable": true,
+            "enum": ["평범", "더러움", "반질반질", "무지개", "반짝이", "특식 요청"]
+          },
+          "requested_promotion_id": { "type": "integer", "format": "int64", "nullable": true },
+          "activity_count": { "type": "integer" },
+          "last_active_at": { "type": "string", "format": "date-time" },
+          "last_gift_at": { "type": "string", "format": "date-time", "nullable": true },
+          "stage_changed_at": { "type": "string", "format": "date-time" },
+          "ear_type": {
+            "type": "string",
+            "enum": ["위로 곧게", "앞으로 접힘", "옆으로 처짐", "뒤로 말림", "아래로 늘어짐"]
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "인증 실패(액세스 토큰 없음/만료)",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "Forbidden": {
+        "description": "권한 없음(관리자 전용 API를 관리자가 아닌 사용자가 호출)",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "NotFound": {
+        "description": "리소스를 찾을 수 없음",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      },
+      "BadRequest": {
+        "description": "요청 검증 실패(예: 신청 기간 종료, 중복 신청)",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      }
+    }
+  },
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "회원가입",
+        "description": "이메일/비밀번호로 가입. 가입과 동시에 펫 1마리(stage=알)가 자동 생성됨.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "가입 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": { "$ref": "#/components/schemas/User" },
+                    "pet": { "$ref": "#/components/schemas/Pet" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "로그인",
+        "description": "로그인 성공 시 액세스 토큰(15분)을 응답 본문으로, 리프레시 토큰(14일)을 httpOnly 쿠키로 발급한다. 로그인 시점에 mood/eggState 하루 단위 리셋, lastActiveAt 갱신, 접속 횟수 카운트가 함께 처리된다.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "로그인 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": { "type": "string" },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "액세스 토큰 재발급",
+        "description": "인증 방식: Authorization 헤더가 아닌, httpOnly 쿠키로 저장된 리프레시 토큰을 사용한다(PRD 5.1절). 서버는 쿠키의 리프레시 토큰을 refresh_tokens 테이블의 해시와 대조해 검증한 뒤 새 액세스 토큰을 발급한다.",
+        "responses": {
+          "200": {
+            "description": "재발급 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "accessToken": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "로그아웃",
+        "description": "쿠키의 리프레시 토큰에 해당하는 refresh_tokens 행을 삭제해 즉시 무효화한다.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "로그아웃 성공" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/promotions": {
+      "get": {
+        "tags": ["promotion"],
+        "summary": "프로모션 목록 조회",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "목록 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Promotion" }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      },
+      "post": {
+        "tags": ["promotion"],
+        "summary": "프로모션 등록(관리자 전용)",
+        "description": "단일 관리자 계정만 호출 가능(PRD 3.1절, 별도 권한 체계 없음).",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "start_date", "end_date", "content", "special_food_id"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "start_date": { "type": "string", "format": "date" },
+                  "end_date": { "type": "string", "format": "date" },
+                  "content": { "type": "string" },
+                  "special_food_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "등록 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Promotion" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        }
+      }
+    },
+    "/promotions/{promotionId}": {
+      "get": {
+        "tags": ["promotion"],
+        "summary": "프로모션 상세 조회",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "promotionId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "상세 조회 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Promotion" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["promotion"],
+        "summary": "프로모션 수정(관리자 전용)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "promotionId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "start_date": { "type": "string", "format": "date" },
+                  "end_date": { "type": "string", "format": "date" },
+                  "content": { "type": "string" },
+                  "special_food_id": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "수정 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Promotion" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/promotions/{promotionId}/apply": {
+      "post": {
+        "tags": ["promotion"],
+        "summary": "프로모션 신청",
+        "description": "신청 기간 내에만 가능하며 중복 신청은 방지된다(9-schema.sql UNIQUE(user_id, promotion_id)). 신청 완료 시 해당 프로모션의 특식을 보유하게 된다. 신청 취소 기능은 제공하지 않는다.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "promotionId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "201": {
+            "description": "신청 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Application" } } }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/promotions/{promotionId}/favorite": {
+      "post": {
+        "tags": ["promotion"],
+        "summary": "찜 토글",
+        "description": "찜 상태를 즉시 토글한다(찜 안 되어 있으면 등록, 되어 있으면 해제).",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "promotionId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "토글 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "favorited": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/applications": {
+      "get": {
+        "tags": ["application"],
+        "summary": "나의 신청 목록 조회",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Application" }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/pet": {
+      "get": {
+        "tags": ["pet"],
+        "summary": "내 펫 조회",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "조회 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/pet/name": {
+      "patch": {
+        "tags": ["pet"],
+        "summary": "펫 이름 짓기/재설정",
+        "description": "최초 로그인 시 선택 입력(건너뛰면 기본 이름), 이후 언제든 재설정 가능. 사망 또는 성체 순환으로 새 알이 생기면 다시 지어야 한다.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "nullable": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "설정 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/pet/bathe": {
+      "post": {
+        "tags": ["pet"],
+        "summary": "펫 목욕시키기",
+        "description": "알 단계는 eggState를 반질반질로, 새끼/성체 단계는 mood가 더러움일 때 평범으로 변화시키고 activityCount가 1 증가한다.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "행동 처리 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/pet/feed": {
+      "post": {
+        "tags": ["pet"],
+        "summary": "펫 밥주기(기본 주식)",
+        "description": "기본 주식(쌀밥)만 주는 행동으로 특식 효과가 전혀 없다. 알 단계는 방치 시 더러움 방지, 새끼/성체는 mood 배고픔일 때 평범으로 변화. activityCount가 1 증가한다. '특식 주기'와는 완전히 분리된 별도 엔드포인트다.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "행동 처리 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/pet/feed-special-food": {
+      "post": {
+        "tags": ["pet"],
+        "summary": "펫 특식 주기",
+        "description": "보유 중인 특식(신청 완료한 프로모션 기준)이 1개 이상일 때만 가능하며, 여러 개 보유 시 급여할 프로모션을 지정한다. mood/eggState가 '특식 요청'이고 대상(requestedPromotionId)과 일치하면 무지개로 변화. 그 외 자발적 급여는 10% 확률로 특수효과(50% 진화/50% 반짝이) 발생. '밥'과는 완전히 분리된 별도 엔드포인트다.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["promotionId"],
+                "properties": {
+                  "promotionId": { "type": "integer", "format": "int64", "description": "급여할 특식이 속한 프로모션 id(보유 중이어야 함)" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "행동 처리 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } } }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/pet/pat": {
+      "post": {
+        "tags": ["pet"],
+        "summary": "펫 쓰다듬기",
+        "description": "알 단계는 activityCount만 증가, 새끼/성체 단계는 mood가 삐짐일 때 평범으로 변화시키고 activityCount가 1 증가한다.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "행동 처리 성공",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } } }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/pet/fortune": {
+      "post": {
+        "tags": ["pet"],
+        "summary": "오늘의 운세",
+        "description": "stage가 새끼/성체일 때만 이용 가능. 하루 1회만 뽑을 수 있고 같은 날 재요청 시 동일 결과를 반환한다(다음날 재뽑기 가능).",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "운세 조회 성공",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    }
+  }
+}

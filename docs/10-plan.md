@@ -23,16 +23,16 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - `backend/.env.example`에 `DATABASE_URL`, `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`, `PORT` 최소 목록을 정의한다(`6-project-principle.md` 5장).
 - 선행: DB-1
 - 완료 조건:
-  - [ ] `pool.js`가 `DATABASE_URL`로 연결되는 `pg.Pool` 인스턴스를 export한다.
-  - [ ] `.env.example`에 4개 변수가 모두 정의되어 있고 실제 시크릿 값은 커밋되지 않는다.
+  - [x] `pool.js`가 `DATABASE_URL`로 연결되는 `pg.Pool` 인스턴스를 export한다.
+  - [x] `.env.example`에 4개 변수가 모두 정의되어 있고 실제 시크릿 값은 커밋되지 않는다.
 
 ### DB-3. 관리자 계정 및 샘플 프로모션 시드 데이터
 - 단일 관리자 계정 1개(이메일 화이트리스트 판정에 쓸 이메일)와 샘플 프로모션 2~3건(진행중 1건, 기간종료 1건 포함, 각각 다른 특식 표현용 `special_food_id`)을 넣는 시드 SQL(`backend/src/db/seed.sql`)을 작성한다.
 - 회원가입 API로 만들 수 없는 초기 데이터(관리자 계정 비밀번호 해시, 샘플 프로모션)만 시드에 담고, 그 외 새 테이블/컬럼은 만들지 않는다.
 - 선행: DB-1
 - 완료 조건:
-  - [ ] `seed.sql` 실행 시 관리자 계정 1개와 프로모션 2~3건(기간종료 포함)이 삽입된다.
-  - [ ] 실제로 로컬 DB에 적용해 `SELECT`로 데이터가 보이는 것을 확인했다.
+  - [x] `seed.sql` 실행 시 관리자 계정 1개와 프로모션 2~3건(기간종료 포함)이 삽입된다.
+  - [x] 실제로 로컬 DB에 적용해 `SELECT`로 데이터가 보이는 것을 확인했다.
 
 ---
 

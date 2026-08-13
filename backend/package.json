@@ -1,0 +1,10 @@
+{
+  "name": "b2b-promo-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "pg": "^8.13.0"
+  }
+}

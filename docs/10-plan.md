@@ -43,8 +43,8 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - `backend/src/middleware/error.middleware.js`에 공통 에러 핸들러를 만들어 모든 에러 응답을 `{ error: { code, message } }` 형태로 통일한다(`6-project-principle.md` 7장).
 - 선행: DB-2
 - 완료 조건:
-  - [ ] `node backend/src/server.js`로 서버가 기동되고 지정된 `PORT`에서 응답한다.
-  - [ ] 존재하지 않는 라우트나 강제로 던진 에러가 `{ error: { code, message } }` 형식으로 응답된다.
+  - [x] `node backend/src/server.js`로 서버가 기동되고 지정된 `PORT`에서 응답한다.
+  - [x] 존재하지 않는 라우트나 강제로 던진 에러가 `{ error: { code, message } }` 형식으로 응답된다.
 
 ### BE-2. 인증 도메인 (회원가입/로그인/토큰)
 - `backend/src/services/auth.service.js`: 이메일/비밀번호 회원가입(bcrypt 해시), 로그인, 가입 시 펫 1마리 자동 생성(`stage='알'`, `activity_count=0`), 액세스 토큰(15분)/리프레시 토큰(14일) 발급, 리프레시 토큰으로 액세스 토큰 재발급.

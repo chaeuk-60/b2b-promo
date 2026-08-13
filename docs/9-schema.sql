@@ -9,6 +9,18 @@ CREATE TABLE users (
     password_hash TEXT NOT NULL
 );
 
+-- 발급된 리프레시 토큰 저장(로그아웃/강제 만료 시 해당 행을 DELETE 하면 즉시 무효화됨)
+-- 토큰 원문 대신 해시만 저장하고, 무효화는 별도 revoked 플래그 없이 행 삭제로 처리한다.
+CREATE TABLE refresh_tokens (
+    id          BIGSERIAL PRIMARY KEY,
+    user_id     BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash  TEXT NOT NULL UNIQUE,
+    expires_at  TIMESTAMPTZ NOT NULL, -- 발급 시각 + 14일
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_refresh_tokens_user_id ON refresh_tokens(user_id); -- 로그아웃 시 사용자별 일괄 삭제용
+
 CREATE TABLE promotions (
     id               BIGSERIAL PRIMARY KEY,
     title            TEXT NOT NULL,

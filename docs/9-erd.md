@@ -5,6 +5,7 @@
 ```mermaid
 erDiagram
     USER ||--|| PET : "가입 시 자동 생성"
+    USER ||--o{ REFRESH_TOKEN : "발급"
     USER ||--o{ APPLICATION : "신청"
     USER ||--o{ FAVORITE : "찜"
     PROMOTION ||--o{ APPLICATION : "신청 대상"
@@ -14,6 +15,14 @@ erDiagram
         ID id PK
         string email
         string password
+    }
+
+    REFRESH_TOKEN {
+        ID id PK
+        ID userId FK
+        string tokenHash "토큰 원문 대신 해시 저장"
+        datetime expiresAt "발급 + 14일"
+        datetime createdAt
     }
 
     PROMOTION {
@@ -55,6 +64,7 @@ erDiagram
 
 ## 엔티티 설명
 - **USER**: 이메일/비밀번호로 가입하는 사용자(거래처 담당자) 계정.
+- **REFRESH_TOKEN**: 발급된 리프레시 토큰(해시)의 저장소. 로그아웃·강제 만료 시 해당 행을 삭제해 즉시 무효화한다. 별도 revoked 플래그는 두지 않고 행 삭제로 처리.
 - **PROMOTION**: 회사가 등록하는 신청 가능한 프로모션 상품/이벤트.
 - **APPLICATION**: 사용자가 특정 프로모션에 신청한 이력.
 - **FAVORITE**: 사용자가 특정 프로모션을 찜(관심 표시)한 이력. userId+promotionId 복합키.

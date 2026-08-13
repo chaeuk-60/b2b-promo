@@ -15,8 +15,8 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - 로컬 PostgreSQL 17에 실제로 적용해 테이블 6개가 생성되는지 확인한다.
 - 선행: 없음
 - 완료 조건:
-  - [ ] `backend/src/db/migrations/001_init.sql` 파일이 `9-schema.sql`과 동일한 내용으로 생성되어 있다.
-  - [ ] 로컬 DB에 마이그레이션을 실행해 `users/refresh_tokens/promotions/applications/favorites/pets` 6개 테이블이 정상 생성된다.
+  - [x] `backend/src/db/migrations/001_init.sql` 파일이 `9-schema.sql`과 동일한 내용으로 생성되어 있다.
+  - [x] 로컬 DB에 마이그레이션을 실행해 `users/refresh_tokens/promotions/applications/favorites/pets` 6개 테이블이 정상 생성된다.
 
 ### DB-2. pg 연결 풀 모듈 및 환경변수 정의
 - `backend/src/db/pool.js`에 `pg.Pool`을 생성하고 export하는 모듈을 작성한다(`DATABASE_URL` 환경변수 사용).

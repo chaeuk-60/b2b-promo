@@ -78,14 +78,14 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
   - [ ] 찜 토글 API가 즉시 반영되고(행 생성/삭제), 신청 완료된 프로모션은 "보유 특식 조회"에 포함된다.
 
 ### BE-5. 펫 조회 및 이름 짓기, 로그인 연동 하루 리셋
-- `backend/src/services/pet.service.js`에 `getPet`, `nameOwnPet`(이름 짓기/재설정), `resolveMoodOnLogin`(자정 기준 KST로 "마지막 갱신일 != 오늘"이면 mood/eggState 랜덤 재설정 및 접속횟수 카운트, lazy 처리, 별도 배치 없음) 함수를 작성한다.
+- `backend/src/services/pet.service.js`에 `getPet`, `nameOwnPet`(이름 짓기/재설정), `resolveMoodOnLogin`(자정 기준 KST로 날짜가 바뀌면 그날 접속 횟수 카운트를 초기화하고, 매 로그인마다 도메인 정의서 5.1절 규칙대로 mood/eggState를 재계산: 1회차 균등 랜덤 → 2회차부터 70% 평범/30% 재추첨 → 3회차부터 30% 확률로 행복 덮어씀. 단 이미 오늘 "행복"/"무지개"/"반짝이"가 됐으면 재계산하지 않고 그대로 유지. lazy 처리, 별도 배치 없음) 함수를 작성한다.
 - 로그인 흐름(BE-2 `auth.service.js`의 로그인 처리)에서 `resolveMoodOnLogin`을 호출하도록 연결한다.
 - `backend/src/controllers/pet.controller.js`, `backend/src/routes/pet.routes.js`에 펫 조회/이름짓기 엔드포인트 추가.
 - 선행: BE-2
 - 완료 조건:
-  - [ ] 로그인 API 호출 시 당일 최초 로그인이면 mood(또는 eggState)가 랜덤 재설정되고, 같은 날 재로그인 시 유지된다.
+  - [ ] 로그인 API 호출 시 그날 몇 번째 접속인지에 따라 mood(또는 eggState)가 도메인 정의서 5.1절 규칙대로 재계산된다(1회차 랜덤, 2회차부터 대체로 평범).
   - [ ] 이름 짓기 API로 이름을 설정/변경할 수 있고, 건너뛰면 기본 이름이 표시된다.
-  - [ ] 하루 3회 이상 접속 시 mood가 "행복"으로 바뀐다.
+  - [ ] 오늘 하루 중 mood가 "행복"/"무지개"/"반짝이"가 된 적이 있으면, 이후 같은 날 재로그인해도 재계산되지 않고 그 상태가 유지된다.
 
 ### BE-6. 펫 행동 처리 (목욕/밥/특식주기/쓰다듬기, 성장 전이)
 - `pet.service.js`에 `applyAction(action)`(목욕/밥/쓰다듬기 - 도메인 정의서 5.1 표대로 mood/eggState 개선), `feedSpecialFood(promotionId)`(보유 특식 급여: 요청중이면 무지개, 자발적이면 10%→50/50 특수효과), `checkStageTransition`(알→새끼, 새끼→성체, activityCount 조건 충족 시 50% 판정)을 구현한다.

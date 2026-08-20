@@ -13,6 +13,21 @@ function hashToken(token) {
   return crypto.createHash('sha256').update(token).digest('hex');
 }
 
+const ACCESS_EXPIRES = process.env.JWT_ACCESS_EXPIRES || '15m';
+const REFRESH_EXPIRES = process.env.JWT_REFRESH_EXPIRES || '14d';
+
+// jsonwebtoken의 expiresIn과 같은 표기(예: '15m', '14d')를 ms로 변환한다.
+// refresh_tokens.expires_at(DB)을 JWT_REFRESH_EXPIRES와 어긋나지 않게 계산하기 위함.
+function parseExpiresMs(value) {
+  const match = /^(\d+)\s*(s|m|h|d)$/.exec(value.trim());
+  if (!match) {
+    throw new Error(`지원하지 않는 만료 시간 형식입니다: ${value} (예: 15m, 14d)`);
+  }
+  const amount = Number(match[1]);
+  const unitMs = { s: 1000, m: 60 * 1000, h: 60 * 60 * 1000, d: 24 * 60 * 60 * 1000 }[match[2]];
+  return amount * unitMs;
+}
+
 async function signup({ email, password }) {
   if (!email || !password) {
     throw Object.assign(new Error('이메일과 비밀번호를 입력해주세요.'), {
@@ -83,20 +98,21 @@ async function login({ email, password }) {
   }
 
   const accessToken = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: '15m',
+    expiresIn: ACCESS_EXPIRES,
   });
   // jti(무작위 토큰 ID)를 넣지 않으면 같은 초 안에 재로그인 시 payload/발급시각/만료시각이 모두 같아
   // 리프레시 토큰 JWT 문자열이 완전히 동일해지고, token_hash UNIQUE 제약을 위반한다.
   const refreshToken = jwt.sign(
     { sub: user.id, jti: crypto.randomBytes(16).toString('hex') },
     process.env.JWT_REFRESH_SECRET,
-    { expiresIn: '14d' }
+    { expiresIn: REFRESH_EXPIRES }
   );
 
   const tokenHash = hashToken(refreshToken);
+  const refreshExpiresAt = new Date(Date.now() + parseExpiresMs(REFRESH_EXPIRES));
   await pool.query(
-    "INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, now() + interval '14 days')",
-    [user.id, tokenHash]
+    'INSERT INTO refresh_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, $3)',
+    [user.id, tokenHash, refreshExpiresAt]
   );
 
   await petService.checkDeathOrCycle(user.id);
@@ -143,7 +159,7 @@ async function refreshAccessToken({ refreshToken }) {
   const user = userResult.rows[0];
 
   const accessToken = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: '15m',
+    expiresIn: ACCESS_EXPIRES,
   });
 
   return { accessToken };

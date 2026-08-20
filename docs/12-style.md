@@ -40,10 +40,11 @@
 
 ## 4. 픽셀 테두리 & 모서리
 
-- **모든** 카드/입력창/버튼(주요·보조·찜 구분 없이)은 `border-radius`로 둥글리지 않는다. 대신 네 모서리를 계단형으로 잘라내는 **픽셀 노치**를 `clip-path: polygon(...)`으로 적용해 "픽셀 찍은 것 같은" 각진 모서리를 만든다(단순 직사각형이 아니라 모서리가 한 칸 꺾여 들어간 모양). 버튼 종류 구분은 모양이 아니라 배경색으로만 한다 - 모양/높이가 버튼마다 다르면 오히려 일관성이 깨져 보인다.
+- **카드/버튼**(주요·보조·찜 구분 없이)은 `border-radius`로 둥글리지 않는다. 대신 네 모서리를 계단형으로 잘라내는 **픽셀 노치**를 `clip-path: polygon(...)`으로 적용해 "픽셀 찍은 것 같은" 각진 모서리를 만든다(단순 직사각형이 아니라 모서리가 한 칸 꺾여 들어간 모양). 버튼 종류 구분은 모양이 아니라 배경색으로만 한다 - 모양/높이가 버튼마다 다르면 오히려 일관성이 깨져 보인다.
   ```css
   :root {
     --pixel-notch: 6px;
+    --pixel-border: 3px;
     --pixel-corners: polygon(
       0 var(--pixel-notch), var(--pixel-notch) var(--pixel-notch), var(--pixel-notch) 0,
       calc(100% - var(--pixel-notch)) 0, calc(100% - var(--pixel-notch)) var(--pixel-notch), 100% var(--pixel-notch),
@@ -51,8 +52,25 @@
       var(--pixel-notch) 100%, var(--pixel-notch) calc(100% - var(--pixel-notch)), 0 calc(100% - var(--pixel-notch))
     );
   }
-  .pixel-card, .pixel-btn, .pixel-input { clip-path: var(--pixel-corners); }
   ```
+- **주의**: `border` 속성은 `clip-path`가 잘라낸 대각선 모서리를 따라가지 못해서, 노치 모서리마다 테두리가 끊기고 빈틈이 생긴다(모서리가 "연결이 안 되는" 문제). 그래서 `border`를 쓰지 않고, "바깥은 잉크색 도형 전체, 그 위에 `--pixel-border`(3px)만큼 안쪽으로 종이색 도형을 겹쳐서" 테두리처럼 보이게 한다 - 안쪽 도형도 같은 `--pixel-corners`를 쓰므로 모서리가 안팎 모두 끊김 없이 이어진다.
+  ```css
+  .pixel-card, .pixel-btn {
+    position: relative;
+    isolation: isolate; /* ::before의 z-index:-1이 카드 밖으로 새지 않게 가둔다 */
+    background: var(--ink); /* 잉크색이 곧 "테두리" */
+    clip-path: var(--pixel-corners);
+  }
+  .pixel-card::before, .pixel-btn::before {
+    content: '';
+    position: absolute;
+    inset: var(--pixel-border); /* 테두리 두께만큼 안쪽으로 */
+    background: var(--paper); /* 종류별로 여기 배경색만 바꾸면 됨(예: 주요 버튼은 --accent-green) */
+    clip-path: var(--pixel-corners);
+    z-index: -1;
+  }
+  ```
+  - `input`은 대체 요소(replaced element)라 `::before`가 안 그려지므로 이 트릭을 쓸 수 없다. 입력창만 예외로 `border` + 작은 `border-radius`(노치 아님)를 그대로 쓴다.
 - 그림자는 **하드 섀도우**(픽셀 블록 그림자)를 쓰되, `box-shadow`는 `clip-path`로 잘린 모양을 따라가지 않으므로 `filter: drop-shadow(...)`를 쓴다. blur 없이 순수 오프셋만. hover/active 시 오프셋을 줄여 "눌리는" 느낌을 준다.
   ```css
   .pixel-card { filter: drop-shadow(4px 4px 0 var(--ink)); }

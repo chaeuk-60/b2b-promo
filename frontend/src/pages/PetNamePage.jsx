@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNamePet } from '../hooks/usePet';
 
-const DEFAULT_PET_NAME = '몽실이';
+const DEFAULT_PET_NAME = '김커푸';
 
 function PetNamePage() {
   const navigate = useNavigate();

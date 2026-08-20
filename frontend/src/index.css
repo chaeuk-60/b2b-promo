@@ -87,17 +87,29 @@ a {
   filter: drop-shadow(6px 6px 0 var(--ink));
 }
 
-/* 버튼 기본: 각진(노치) 보조 버튼(12-style.md 5장 - 알약형은 주요 버튼 전용) */
+/* 버튼: 모든 버튼(보조/주요/찜)을 각진 픽셀 노치로 통일하고 높이를 고정해서
+   글자 길이/폰트 크기와 무관하게 항상 같은 모양·높이가 되도록 한다.
+   구분은 모양이 아니라 배경색으로만 한다(보조=흰색, 주요=초록, 찜=선택시 핑크). */
 .pixel-btn {
   font-family: inherit;
   font-size: 14px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
   border: 3px solid var(--ink);
   clip-path: var(--pixel-corners);
-  padding: 8px 20px;
+  padding: 0 20px;
   background: var(--paper);
   color: var(--ink);
   filter: drop-shadow(4px 4px 0 var(--ink));
   cursor: pointer;
+}
+
+/* 나란히 놓인 버튼끼리 서로 붙지 않게 간격을 준다 */
+.pixel-btn + .pixel-btn {
+  margin-left: var(--space-2);
 }
 
 .pixel-btn:active:not(:disabled) {
@@ -113,11 +125,8 @@ a {
   cursor: not-allowed;
 }
 
-/* 주요 액션만 알약형 + 초록 배경으로 강조(12-style.md 5장) - 알약형은 노치 대신 완전히 둥글림 */
 .pixel-btn-primary {
   background: var(--accent-green);
-  clip-path: none;
-  border-radius: 999px;
 }
 
 .pixel-btn-favorite {

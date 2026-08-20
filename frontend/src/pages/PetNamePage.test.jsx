@@ -45,24 +45,24 @@ describe('PetNamePage', () => {
   });
 
   it('건너뛰기를 누르면 기본 이름으로 저장한 뒤 목록 화면으로 이동한다', async () => {
-    namePet.mockResolvedValue({ pet: { name: '몽실이' } });
+    namePet.mockResolvedValue({ pet: { name: '김커푸' } });
     renderPetNamePage();
 
     fireEvent.click(screen.getByRole('button', { name: '건너뛰기' }));
 
     await waitFor(() => expect(screen.getByText('프로모션 목록')).toBeInTheDocument());
     expect(namePet).toHaveBeenCalled();
-    expect(namePet.mock.calls[0][0]).toEqual({ name: '몽실이' });
+    expect(namePet.mock.calls[0][0]).toEqual({ name: '김커푸' });
   });
 
   it('이름을 입력하지 않고 확인을 누르면 기본 이름으로 저장된다', async () => {
-    namePet.mockResolvedValue({ pet: { name: '몽실이' } });
+    namePet.mockResolvedValue({ pet: { name: '김커푸' } });
     renderPetNamePage();
 
     fireEvent.click(screen.getByRole('button', { name: '확인' }));
 
     await waitFor(() => expect(screen.getByText('프로모션 목록')).toBeInTheDocument());
-    expect(namePet.mock.calls[0][0]).toEqual({ name: '몽실이' });
+    expect(namePet.mock.calls[0][0]).toEqual({ name: '김커푸' });
   });
 
   it('저장 실패 시 에러 메시지가 표시되고 화면에 머무른다', async () => {

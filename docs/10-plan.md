@@ -147,12 +147,12 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 ### FE-4. 프로모션 목록 화면
 - `frontend/src/api/promotion.api.js`, `frontend/src/hooks/usePromotions.js`(목록 useQuery), `frontend/src/hooks/useToggleFavorite.js`(useMutation).
 - `frontend/src/pages/PromotionListPage.jsx`, `frontend/src/components/promotion/PromotionCard.jsx`, `frontend/src/components/promotion/FavoriteButton.jsx`: 특식 이모지+제목/기간/내용 요약, 찜 토글, 기간종료 시 "담당자에게 연락 주세요" 안내(`8-wireframe.md` 3번).
-- 좁은 화면 1열 / 넓은 화면 그리드는 CSS만으로 처리(컴포넌트 분기 없음).
+- 화면 폭과 무관하게 항상 1열로 쌓는다(카드 하나가 폭을 다 쓰는 편이 가독성이 좋다는 피드백 반영, `PromotionListPage.css`).
 - 선행: BE-4, FE-1
 - 완료 조건:
   - [x] 프로모션 목록이 카드 형태로 렌더링되고 찜 버튼이 즉시 토글된다(리스트 재조회 없이 낙관적 갱신 또는 재조회 중 하나로 반영).
   - [x] 기간 종료된 프로모션은 신청 버튼이 비활성화되고 안내 문구가 표시된다.
-  - [x] 브라우저 폭을 좁혔을 때 1열, 넓혔을 때 그리드로 재배치된다(CSS 미디어 쿼리, `PromotionListPage.css`).
+  - [x] 화면 폭과 무관하게 카드가 1열로 쌓인다(`PromotionListPage.css`).
 
 ### FE-5. 프로모션 상세 화면
 - `frontend/src/pages/PromotionDetailPage.jsx`, `frontend/src/hooks/useApplyPromotion.js`(useMutation): 제목/기간/내용 + 찜 토글 + 신청 버튼(신청 완료 시 상태 표시로 전환, `8-wireframe.md` 4번).

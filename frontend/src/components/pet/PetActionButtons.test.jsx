@@ -1,5 +1,5 @@
-// FE-8 완료 조건: 목욕/밥/쓰다듬기 클릭 시 상태 갱신, 보유 특식 유무에 따른 특식 주기
-// 활성화/선택, 오늘의 운세는 알 단계 비활성/새끼·성체 전용.
+// FE-8 완료 조건: 목욕/쓰다듬기 클릭 시 상태 갱신, "밥" 드롭다운(기본 주식/특식 주기)에서
+// 보유 특식 유무에 따른 활성화/선택, 오늘의 운세는 알 단계 비활성/새끼·성체 전용.
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -36,39 +36,48 @@ describe('PetActionButtons', () => {
     vi.clearAllMocks();
   });
 
-  it('목욕/밥/쓰다듬기 버튼 클릭 시 각각의 행동 API가 호출된다', async () => {
+  it('목욕/쓰다듬기 버튼 클릭 시 각각의 행동 API가 호출된다', async () => {
     bathePet.mockResolvedValue({});
-    feedPet.mockResolvedValue({});
     patPet.mockResolvedValue({});
     renderButtons(adultPet);
 
     fireEvent.click(screen.getByRole('button', { name: '목욕' }));
     await waitFor(() => expect(bathePet).toHaveBeenCalled());
 
-    fireEvent.click(screen.getByRole('button', { name: '밥' }));
-    await waitFor(() => expect(feedPet).toHaveBeenCalled());
-
     fireEvent.click(screen.getByRole('button', { name: '쓰다듬기' }));
     await waitFor(() => expect(patPet).toHaveBeenCalled());
   });
 
-  it('보유 특식이 없으면 특식 주기 버튼이 비활성화된다', async () => {
-    renderButtons(adultPet, []);
+  it('밥 버튼을 누르면 기본 주식/특식 주기 선택지가 나오고, 기본 주식을 고르면 feedPet이 호출된다', async () => {
+    feedPet.mockResolvedValue({});
+    renderButtons(adultPet);
 
-    await waitFor(() => expect(listMyApplications).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: '특식 주기' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: /^밥/ }));
+    const basicButton = await screen.findByRole('button', { name: /기본 주식/ });
+    fireEvent.click(basicButton);
+
+    await waitFor(() => expect(feedPet).toHaveBeenCalled());
   });
 
-  it('보유 특식이 있으면 목록에서 선택해 급여할 수 있다', async () => {
+  it('보유 특식이 없으면 밥 메뉴의 특식 주기 항목이 비활성화된다', async () => {
+    renderButtons(adultPet, []);
+
+    fireEvent.click(screen.getByRole('button', { name: /^밥/ }));
+    const specialButton = await screen.findByRole('button', { name: /특식 주기/ });
+    await waitFor(() => expect(specialButton).toBeDisabled());
+  });
+
+  it('보유 특식이 있으면 특식 주기에서 목록을 선택해 급여할 수 있다', async () => {
     feedSpecialFood.mockResolvedValue({});
     renderButtons(adultPet, [
       { promotion_id: 1, title: '여름맞이 쌀 증정', special_food_id: 'rice-cake' },
     ]);
 
-    const feedButton = screen.getByRole('button', { name: '특식 주기' });
-    await waitFor(() => expect(feedButton).not.toBeDisabled());
+    fireEvent.click(screen.getByRole('button', { name: /^밥/ }));
+    const specialButton = await screen.findByRole('button', { name: /특식 주기/ });
+    await waitFor(() => expect(specialButton).not.toBeDisabled());
+    fireEvent.click(specialButton);
 
-    fireEvent.click(feedButton);
     expect(await screen.findByText('줄 특식을 선택하세요')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('radio'));

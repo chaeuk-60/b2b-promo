@@ -6,6 +6,14 @@ export function listPromotions() {
   return client.get('/promotions').then((res) => res.data);
 }
 
+export function getPromotion(promotionId) {
+  return client.get(`/promotions/${promotionId}`).then((res) => res.data);
+}
+
 export function toggleFavorite(promotionId) {
   return client.post(`/promotions/${promotionId}/favorite`).then((res) => res.data);
+}
+
+export function applyPromotion(promotionId) {
+  return client.post(`/promotions/${promotionId}/apply`).then((res) => res.data);
 }

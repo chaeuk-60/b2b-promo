@@ -1,0 +1,12 @@
+/* 좁은 화면 1열 / 넓은 화면 그리드(컴포넌트 분기 없이 CSS만으로 처리, 10-plan.md FE-4) */
+.promotion-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 720px) {
+  .promotion-list {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}

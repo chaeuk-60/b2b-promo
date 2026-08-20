@@ -23,8 +23,10 @@ describe('App 라우팅', () => {
   });
 
   it('/promotions 경로는 프로모션 목록 페이지를 보여준다', () => {
+    // PromotionListPage는 이제 실제 API를 호출하는 화면이라(내용 검증은
+    // PromotionListPage.test.jsx가 담당), 여기서는 라우팅 자체만 확인한다.
     renderAt('/promotions');
-    expect(screen.getByText('프로모션 목록')).toBeInTheDocument();
+    expect(screen.getByText('불러오는 중...')).toBeInTheDocument();
   });
 
   it('/promotions/:id 경로는 프로모션 상세 페이지를 보여준다', () => {

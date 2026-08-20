@@ -1,7 +1,7 @@
 ---
 name: backend-resolver
 description: 단계별 백엔드 개발을 위한 Skill
-arguments: TASK_NUMBER
+argument-hint: TASK_NUMBER
 disable-model-invocation: true
 ---
 

@@ -62,4 +62,13 @@ async function feedSpecialFood(req, res, next) {
   }
 }
 
-module.exports = { getMyPet, nameMyPet, bathe, feed, feedSpecialFood, pat };
+async function fortune(req, res, next) {
+  try {
+    const message = await petService.getTodayFortune(req.user.id);
+    res.status(200).json({ message });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getMyPet, nameMyPet, bathe, feed, feedSpecialFood, pat, fortune };

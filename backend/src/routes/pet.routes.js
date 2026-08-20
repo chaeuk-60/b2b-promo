@@ -11,5 +11,6 @@ router.post('/bathe', authMiddleware, petController.bathe);
 router.post('/feed', authMiddleware, petController.feed);
 router.post('/feed-special-food', authMiddleware, petController.feedSpecialFood);
 router.post('/pat', authMiddleware, petController.pat);
+router.post('/fortune', authMiddleware, petController.fortune);
 
 module.exports = router;

@@ -60,6 +60,8 @@ erDiagram
         datetime lastGiftAt
         datetime stageChangedAt
         string earType
+        string fortuneMessage "오늘 뽑은 운세 문구"
+        string fortuneDate "운세를 뽑은 날짜(하루 1회 제한용)"
     }
 ```
 

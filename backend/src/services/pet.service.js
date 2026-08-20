@@ -9,6 +9,19 @@ const EGG_BASE_STATES = ['평범', '더러움', '반질반질', '특식 요청']
 // 도메인 정의서 2장의 귀 타입 5종(auth.service.js의 signup과 동일)
 const EAR_TYPES = ['위로 곧게', '앞으로 접힘', '옆으로 처짐', '뒤로 말림', '아래로 늘어짐'];
 
+// 오늘의 운세 문구(도메인 정의서 5장): 특정 종교/미신/의학적 표현 없이 가벼운 응원 톤.
+const FORTUNE_MESSAGES = [
+  '오늘은 평소보다 조금 더 용기를 내도 좋은 날이에요.',
+  '생각지도 못한 곳에서 좋은 소식이 들려올 거예요.',
+  '작은 습관 하나가 오늘 큰 변화를 만들어줄 수 있어요.',
+  '미뤄뒀던 일을 시작하기에 딱 좋은 타이밍이에요.',
+  '주변 사람에게 건넨 따뜻한 말 한마디가 오늘의 행운을 부를 거예요.',
+  '오늘 하루는 무리하지 말고 나를 먼저 챙겨보세요.',
+  '꾸준함이 빛을 발하는 하루가 될 거예요.',
+  '뜻밖의 기회가 찾아올 수 있으니 주변을 잘 살펴보세요.',
+  '오늘의 작은 성취가 내일의 큰 자신감이 될 거예요.',
+];
+
 // KST(UTC+9) 기준 날짜 문자열(YYYY-MM-DD). 하루 경계 판정에 사용(도메인 정의서 1장 "하루" 기준).
 function toKstDateString(date) {
   return new Date(date.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -320,6 +333,29 @@ async function maybeGrantGift(userId, { random = Math.random } = {}) {
   return pet;
 }
 
+// 오늘의 운세: 새끼/성체 전용, 하루 1회 랜덤 문구 뽑기(같은 날 재요청 시 저장된 결과 유지).
+async function getTodayFortune(userId) {
+  const pet = await getPet(userId);
+  if (!pet || pet.stage === '알' || pet.stage === '묘비') {
+    throw Object.assign(new Error('오늘의 운세는 새끼/성체 단계에서만 이용할 수 있습니다.'), {
+      status: 400,
+      code: 'FORTUNE_NOT_AVAILABLE',
+    });
+  }
+
+  const today = toKstDateString(new Date());
+  if (pet.fortune_date === today) {
+    return pet.fortune_message;
+  }
+
+  const message = pickRandom(FORTUNE_MESSAGES);
+  await pool.query(
+    'UPDATE pets SET fortune_message = $1, fortune_date = $2 WHERE user_id = $3',
+    [message, today, userId]
+  );
+  return message;
+}
+
 module.exports = {
   getPet,
   nameOwnPet,
@@ -328,4 +364,5 @@ module.exports = {
   feedSpecialFood,
   checkDeathOrCycle,
   maybeGrantGift,
+  getTodayFortune,
 };

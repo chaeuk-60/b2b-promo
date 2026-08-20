@@ -61,5 +61,7 @@ CREATE TABLE pets (
     last_gift_at           TIMESTAMPTZ,
     stage_changed_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
     ear_type               TEXT NOT NULL
-                           CHECK (ear_type IN ('위로 곧게', '앞으로 접힘', '옆으로 처짐', '뒤로 말림', '아래로 늘어짐'))
+                           CHECK (ear_type IN ('위로 곧게', '앞으로 접힘', '옆으로 처짐', '뒤로 말림', '아래로 늘어짐')),
+    fortune_message        TEXT, -- 오늘 뽑은 운세 문구(BE-8)
+    fortune_date           TEXT  -- 운세를 뽑은 날짜(KST 'YYYY-MM-DD'), 하루 1회 제한/재요청 시 동일 결과 유지에 사용
 );

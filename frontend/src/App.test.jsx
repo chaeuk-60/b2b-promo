@@ -44,7 +44,9 @@ describe('App 라우팅', () => {
   });
 
   it('/pet 경로는 펫 화면 페이지를 보여준다', () => {
+    // PetPage도 실제 API를 호출하는 화면이라(내용 검증은 PetPage.test.jsx/
+    // PetView.test.jsx가 담당), 여기서는 라우팅 자체만 확인한다.
     renderAt('/pet');
-    expect(screen.getByText('펫 화면')).toBeInTheDocument();
+    expect(screen.getByText('불러오는 중...')).toBeInTheDocument();
   });
 });

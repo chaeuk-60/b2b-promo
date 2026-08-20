@@ -174,8 +174,8 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - `frontend/src/pages/PetPage.jsx`, `frontend/src/components/pet/PetView.jsx`: `stage/mood/eggState/earType`에 따라 `2-pet-design-guide.md` 기준 베이스+오버레이 스프라이트를 분기 렌더(하나의 컴포넌트, 잘게 쪼개지 않음). 이름/상태, 일상 대사 말풍선, 묘비 상태 문구 표시(`8-wireframe.md` 6번).
 - 선행: BE-5, FE-1
 - 완료 조건:
-  - [ ] 펫의 stage/mood(또는 eggState)에 맞는 스프라이트와 대사가 화면에 표시된다.
-  - [ ] 묘비 상태일 때 "자주 오세요..." 메시지가 표시된다.
+  - [x] 펫의 stage/mood(또는 eggState)에 맞는 스프라이트와 대사가 화면에 표시된다.
+  - [x] 묘비 상태일 때 "자주 오세요..." 메시지가 표시된다.
 
 ### FE-8. 펫 화면 - 행동 버튼
 - `frontend/src/hooks/usePetAction.js`(목욕/밥/특식주기/쓰다듬기/운세 useMutation), `frontend/src/components/pet/PetActionButtons.jsx`: 목욕/밥/특식 주기/쓰다듬기 4버튼이 동등하게 노출(밥은 특식 주기의 하위 메뉴가 아니라 완전히 분리된 버튼, `1-domain-definition.md` "특식 주기 버튼" 규칙) + 특식 주기 클릭 시 보유 특식 목록에서 선택 + 오늘의 운세 버튼(새끼/성체 전용, `8-wireframe.md` 6번).

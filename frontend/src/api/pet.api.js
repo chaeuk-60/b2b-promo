@@ -2,6 +2,10 @@
 // 조회/행동 API가 이어서 추가된다.
 import client from './client';
 
+export function getPet() {
+  return client.get('/pet').then((res) => res.data.pet);
+}
+
 export function namePet({ name }) {
   return client.patch('/pet/name', { name }).then((res) => res.data);
 }

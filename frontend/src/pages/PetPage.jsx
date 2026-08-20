@@ -1,6 +1,20 @@
-// FE-7/FE-8에서 실제 펫 화면(상태 표시 + 행동 버튼)으로 채워진다.
+// 펫 화면(8-wireframe.md 6번): 상태 표시(FE-7) + 행동 버튼(FE-8).
+import { Link } from 'react-router-dom';
+import { usePet } from '../hooks/usePet';
+import PetView from '../components/pet/PetView';
+
 function PetPage() {
-  return <div>펫 화면</div>;
+  const { data: pet, isLoading, isError } = usePet();
+
+  if (isLoading) return <p>불러오는 중...</p>;
+  if (isError) return <p>펫 정보를 불러오지 못했습니다.</p>;
+
+  return (
+    <div>
+      <Link to="/promotions">{'< 프로모션 목록'}</Link>
+      <PetView pet={pet} />
+    </div>
+  );
 }
 
 export default PetPage;

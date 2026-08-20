@@ -33,9 +33,9 @@ async function cleanupUser(userId) {
 }
 
 // 테스트에서 생성한 promotion_id를 정리(시드 데이터는 건드리지 않음)
+// pets.requested_promotion_id는 ON DELETE SET NULL이라 수동으로 끊어줄 필요가 없다.
 async function cleanupPromotion(promotionId) {
   if (!promotionId) return;
-  await pool.query('UPDATE pets SET requested_promotion_id = NULL WHERE requested_promotion_id = $1', [promotionId]);
   await pool.query('DELETE FROM applications WHERE promotion_id = $1', [promotionId]);
   await pool.query('DELETE FROM favorites WHERE promotion_id = $1', [promotionId]);
   await pool.query('DELETE FROM promotions WHERE id = $1', [promotionId]);

@@ -6,6 +6,9 @@ const pool = require('../db/pool');
 const MOOD_BASE_STATES = ['더러움', '배고픔', '삐짐', '평범', '행복', '특식 요청'];
 const EGG_BASE_STATES = ['평범', '더러움', '반질반질', '특식 요청'];
 
+// 도메인 정의서 2장의 귀 타입 5종(auth.service.js의 signup과 동일)
+const EAR_TYPES = ['위로 곧게', '앞으로 접힘', '옆으로 처짐', '뒤로 말림', '아래로 늘어짐'];
+
 // KST(UTC+9) 기준 날짜 문자열(YYYY-MM-DD). 하루 경계 판정에 사용(도메인 정의서 1장 "하루" 기준).
 function toKstDateString(date) {
   return new Date(date.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -246,4 +249,83 @@ async function feedSpecialFood(userId, promotionId, { random = Math.random } = {
   return result.rows[0];
 }
 
-module.exports = { getPet, nameOwnPet, resolveMoodOnLogin, applyAction, feedSpecialFood };
+// 새 알로 리셋할 때 공통으로 SET할 컬럼(부활/성체 순환 공용). extraSet은 추가 컬럼(선물 지급 등).
+async function resetToNewEgg(userId, extraSet = '') {
+  const earType = pickRandom(EAR_TYPES);
+  const result = await pool.query(
+    `UPDATE pets
+        SET stage = '알', name = NULL, mood = NULL, egg_state = '평범',
+            requested_promotion_id = NULL, activity_count = 0,
+            ear_type = $1, stage_changed_at = now()${extraSet}
+      WHERE user_id = $2
+      RETURNING *`,
+    [earType, userId]
+  );
+  return result.rows[0];
+}
+
+// 로그인 시 호출: 사망(7일 미접속) 우선 판정 → 이미 죽어있었다면 부활(새 알) → 성체 순환(2주 경과, 선물 100%) 순으로 확인.
+async function checkDeathOrCycle(userId) {
+  const pet = await getPet(userId);
+  if (!pet) return null;
+
+  if (pet.stage !== '묘비') {
+    const deadResult = await pool.query(
+      `UPDATE pets SET stage = '묘비'
+        WHERE user_id = $1 AND last_active_at <= now() - interval '7 days'
+        RETURNING *`,
+      [userId]
+    );
+    if (deadResult.rows.length > 0) return deadResult.rows[0];
+  }
+
+  if (pet.stage === '묘비') {
+    return resetToNewEgg(userId);
+  }
+
+  if (pet.stage === '성체') {
+    const cycleResult = await pool.query(
+      `SELECT 1 FROM pets WHERE user_id = $1 AND stage_changed_at <= now() - interval '14 days'`,
+      [userId]
+    );
+    if (cycleResult.rows.length > 0) {
+      return resetToNewEgg(userId, ', last_gift_at = now()');
+    }
+  }
+
+  return pet;
+}
+
+// 성체 상태에서 3일 쿨다운 후 5% 확률로 선물(last_gift_at 갱신) 지급.
+async function maybeGrantGift(userId, { random = Math.random } = {}) {
+  const pet = await getPet(userId);
+  if (!pet || pet.stage !== '성체') return pet;
+
+  if (pet.last_gift_at) {
+    const cooldownResult = await pool.query(
+      `SELECT 1 FROM pets WHERE user_id = $1 AND last_gift_at > now() - interval '3 days'`,
+      [userId]
+    );
+    if (cooldownResult.rows.length > 0) return pet;
+  }
+
+  if (random() < 0.05) {
+    const result = await pool.query(
+      `UPDATE pets SET last_gift_at = now() WHERE user_id = $1 RETURNING *`,
+      [userId]
+    );
+    return result.rows[0];
+  }
+
+  return pet;
+}
+
+module.exports = {
+  getPet,
+  nameOwnPet,
+  resolveMoodOnLogin,
+  applyAction,
+  feedSpecialFood,
+  checkDeathOrCycle,
+  maybeGrantGift,
+};

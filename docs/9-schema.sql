@@ -54,7 +54,7 @@ CREATE TABLE pets (
                            CHECK (mood IN ('더러움', '배고픔', '삐짐', '평범', '행복', '무지개', '반짝이', '특식 요청')),
     egg_state              TEXT DEFAULT '평범'
                            CHECK (egg_state IN ('평범', '더러움', '반질반질', '무지개', '반짝이', '특식 요청')),
-    requested_promotion_id BIGINT REFERENCES promotions(id), -- mood/eggState가 "특식 요청"일 때 대상(그날 고정)
+    requested_promotion_id BIGINT REFERENCES promotions(id) ON DELETE SET NULL, -- mood/eggState가 "특식 요청"일 때 대상(그날 고정)
     activity_count         INT NOT NULL DEFAULT 0,
     daily_login_count      INT NOT NULL DEFAULT 0, -- 오늘 몇 번째 접속인지(mood 로그인별 재계산 규칙, BE-5). last_active_at 날짜(KST)가 바뀌면 1로 리셋
     last_active_at         TIMESTAMPTZ NOT NULL DEFAULT now(),

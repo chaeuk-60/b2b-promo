@@ -26,11 +26,10 @@ async function cleanupUser(userId) {
 }
 
 // 테스트에서 생성한 promotion_id를 정리(시드 데이터 3건은 절대 건드리지 않음)
-// BE-5의 resolveMoodOnLogin이 다른 테스트의 펫에 이 프로모션을 "특식 요청" 대상으로
-// 랜덤 배정했을 수 있으므로, FK 위반을 피하려면 promotions 삭제 전에 그 참조부터 끊는다.
+// pets.requested_promotion_id는 ON DELETE SET NULL이라 다른 테스트가 이 프로모션을
+// "특식 요청" 대상으로 랜덤 배정해뒀어도 삭제 시 자동으로 NULL 처리된다(수동 정리 불필요).
 async function cleanupPromotion(promotionId) {
   if (!promotionId) return;
-  await pool.query('UPDATE pets SET requested_promotion_id = NULL WHERE requested_promotion_id = $1', [promotionId]);
   await pool.query('DELETE FROM applications WHERE promotion_id = $1', [promotionId]);
   await pool.query('DELETE FROM favorites WHERE promotion_id = $1', [promotionId]);
   await pool.query('DELETE FROM promotions WHERE id = $1', [promotionId]);

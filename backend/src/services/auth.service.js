@@ -99,7 +99,9 @@ async function login({ email, password }) {
     [user.id, tokenHash]
   );
 
-  const pet = await petService.resolveMoodOnLogin(user.id);
+  await petService.checkDeathOrCycle(user.id);
+  await petService.resolveMoodOnLogin(user.id);
+  const pet = await petService.maybeGrantGift(user.id);
 
   return { accessToken, refreshToken, user: { id: user.id, email: user.email }, pet };
 }

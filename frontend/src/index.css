@@ -79,6 +79,12 @@ a {
   filter: drop-shadow(4px 4px 0 var(--ink));
   padding: var(--space-2);
   margin-bottom: var(--space-2);
+  transition: transform 150ms, filter 150ms;
+}
+
+.pixel-card:hover {
+  transform: translateY(-2px);
+  filter: drop-shadow(6px 6px 0 var(--ink));
 }
 
 /* 버튼 기본: 각진(노치) 보조 버튼(12-style.md 5장 - 알약형은 주요 버튼 전용) */
@@ -117,6 +123,11 @@ a {
 .pixel-btn-favorite {
   background: var(--paper);
   font-size: 16px;
+  transition: transform 150ms;
+}
+
+.pixel-btn-favorite:active:not(:disabled) {
+  transform: scale(1.2);
 }
 
 .pixel-btn-favorite[aria-pressed='true'] {

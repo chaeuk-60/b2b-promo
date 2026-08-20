@@ -64,7 +64,7 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - 선행: BE-2
 - 완료 조건:
   - [x] 관리자 이메일로 로그인한 사용자만 `requireAdmin`을 통과한다.
-  - [x] 관리자가 아닌 사용자가 등록/수정 API를 호출하면 403이 반환된다(BE-4에서 실제 프로모션 등록/수정 라우트에 `requireAdmin`을 적용하기 전까지는, `auth.middleware`+`requireAdmin`을 붙인 테스트 전용 라우트로 검증함).
+  - [x] 관리자가 아닌 사용자가 등록/수정 API를 호출하면 403이 반환된다(BE-4에서 실제 `POST/PUT /promotions` 라우트에 `requireAdmin`을 적용, `promotion.test.js`로 검증 완료).
 
 ### BE-4. 프로모션 도메인 (목록/상세/등록·수정/신청/찜)
 - `backend/src/services/promotion.service.js`: 목록/상세 조회, 등록/수정(관리자, title/기간/content/specialFoodId), 신청(기간 내 검증, 중복 신청은 DB UNIQUE로 처리 후 에러 매핑), 찜 토글.
@@ -72,10 +72,10 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - `backend/src/controllers/promotion.controller.js`, `backend/src/routes/promotion.routes.js` 작성.
 - 선행: BE-2, BE-3
 - 완료 조건:
-  - [ ] 목록/상세 조회 API가 정상 동작한다.
-  - [ ] 관리자만 등록/수정 API를 호출할 수 있다.
-  - [ ] 기간이 지난 프로모션 신청 시 에러가 반환되고, 동일 프로모션 중복 신청 시 에러가 반환된다.
-  - [ ] 찜 토글 API가 즉시 반영되고(행 생성/삭제), 신청 완료된 프로모션은 "보유 특식 조회"에 포함된다.
+  - [x] 목록/상세 조회 API가 정상 동작한다.
+  - [x] 관리자만 등록/수정 API를 호출할 수 있다.
+  - [x] 기간이 지난 프로모션 신청 시 에러가 반환되고, 동일 프로모션 중복 신청 시 에러가 반환된다.
+  - [x] 찜 토글 API가 즉시 반영되고(행 생성/삭제), 신청 완료된 프로모션은 "보유 특식 조회"에 포함된다.
 
 ### BE-5. 펫 조회 및 이름 짓기, 로그인 연동 하루 리셋
 - `backend/src/services/pet.service.js`에 `getPet`, `nameOwnPet`(이름 짓기/재설정), `resolveMoodOnLogin`(자정 기준 KST로 날짜가 바뀌면 그날 접속 횟수 카운트를 초기화하고, 매 로그인마다 도메인 정의서 5.1절 규칙대로 mood/eggState를 재계산: 1회차 균등 랜덤 → 2회차부터 70% 평범/30% 재추첨 → 3회차부터 70% 확률로 행복 덮어씀. "특식 요청"은 요청 가능한 후보 프로모션이 1개 이상 있을 때만 랜덤 후보에 포함됨. 단 이미 오늘 "행복"/"무지개"/"반짝이"가 됐으면 재계산하지 않고 그대로 유지. lazy 처리, 별도 배치 없음) 함수를 작성한다.

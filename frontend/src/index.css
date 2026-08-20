@@ -487,6 +487,40 @@ a {
   }
 }
 
+/* 눈 깜빡임: 눈동자 위에서 아래로 얼굴색 사각형이 계단식으로 자라나 덮었다가 다시
+   줄어들게 해서 픽셀 단위로 뚝뚝 감기는 느낌을 낸다(원본 스프라이트 viewBox 160
+   기준 눈 위치 x=50/90,y=60,20x30을 96px 렌더 기준 %로 환산 - 새끼/성체 모든 동물
+   스프라이트가 같은 좌표를 공유한다). */
+.pet-blink-eye {
+  position: absolute;
+  top: 37.5%;
+  width: 12.5%;
+  height: 0;
+  animation: pet-blink 4.5s infinite;
+}
+.pet-blink-eye-left {
+  left: 31.25%;
+}
+.pet-blink-eye-right {
+  left: 56.25%;
+}
+
+@keyframes pet-blink {
+  0%, 91% { height: 0; animation-timing-function: steps(1, jump-end); }
+  92% { height: 6.25%; animation-timing-function: steps(1, jump-end); }
+  93% { height: 12.5%; animation-timing-function: steps(1, jump-end); }
+  94%, 96% { height: 18.75%; animation-timing-function: steps(1, jump-end); }
+  97% { height: 12.5%; animation-timing-function: steps(1, jump-end); }
+  98% { height: 6.25%; animation-timing-function: steps(1, jump-end); }
+  99%, 100% { height: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-blink-eye {
+    animation: none;
+  }
+}
+
 /* 행동 버튼 줄: 좁아지면 줄바꿈하고, 줄바꿈해도 세로 간격이 붙지 않게 gap으로 처리한다. */
 .pet-actions-row {
   position: relative; /* 밥 메뉴가 이 줄 기준으로 위쪽(씬 아래쪽)에 겹쳐서 뜬다 */

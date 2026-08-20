@@ -13,10 +13,35 @@ const EAR_TO_ANIMAL = {
   '아래로 늘어짐': 'dog',
 };
 
+// 성체 스프라이트는 얼굴 색(눈 주변 배경)이 동물마다 달라, 눈 깜빡임 오버레이 색을
+// 맞추는 데 쓴다(SVG 픽셀을 직접 확인해 얻은 값 - 2-pet-design-guide.md에 색상표 없음).
+const FACE_COLOR_BY_ANIMAL = {
+  cat: '#e0f2ff',
+  dog: '#e0ffe7',
+  bear: '#fff3d5',
+  cow: '#eee0ff',
+  rabbit: '#ffdde0',
+};
+
 export function bodySpriteUrl(stage, earType) {
   const animal = EAR_TO_ANIMAL[earType] || 'cat';
   const prefix = stage === '새끼' ? 'baby' : 'adult';
   return `/images/${prefix}-${animal}.svg`;
+}
+
+export function faceColorFor(earType) {
+  const animal = EAR_TO_ANIMAL[earType] || 'cat';
+  return FACE_COLOR_BY_ANIMAL[animal];
+}
+
+// 성체는 원본 스프라이트에 이미 그려진 두 다리 중 한쪽의 발끝 픽셀을 지운 변형 2장을
+// 만들어 두었다(walk-2/walk-3, 스크립트로 생성). 원본(walk-1) <-> 왼발 듦 <-> 오른발
+// 듦을 오가며 걷는 느낌을 낸다. 새끼는 원본 스프라이트에 다리가 따로 그려져 있지 않아
+// (몸통 아래가 평평함) 이 애니메이션을 적용할 수 없다.
+export function adultWalkFrameUrl(earType, frame) {
+  const animal = EAR_TO_ANIMAL[earType] || 'cat';
+  if (frame === 0) return `/images/adult-${animal}.svg`;
+  return `/images/adult-${animal}-walk-${frame + 1}.svg`;
 }
 
 export function eggSpriteUrl(eggState) {

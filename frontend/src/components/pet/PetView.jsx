@@ -11,21 +11,35 @@ import {
   eggDialoguePool,
   pickDialogue,
   HAPPY_WALK_FRAMES,
+  adultWalkFrameUrl,
+  faceColorFor,
   TOMBSTONE_SPRITE_URL,
   TOMBSTONE_MESSAGE,
 } from '../../utils/petSprite';
 
-// 행복 mood는 정적 오버레이 대신 걷기 사이클 애니메이션으로 표현한다(2-pet-design-guide.md).
-function useHappyWalkFrame(isHappy) {
+// N개 프레임을 일정 간격으로 순환한다(행복 mood 걷기 프레임 / 성체 다리 교차 프레임 공용).
+function useFrameCycle(frameCount, enabled, intervalMs = 400) {
   const [frame, setFrame] = useState(0);
 
   useEffect(() => {
-    if (!isHappy) return undefined;
-    const id = setInterval(() => setFrame((f) => (f + 1) % HAPPY_WALK_FRAMES.length), 400);
+    if (!enabled) return undefined;
+    const id = setInterval(() => setFrame((f) => (f + 1) % frameCount), intervalMs);
     return () => clearInterval(id);
-  }, [isHappy]);
+  }, [enabled, frameCount]);
 
   return frame;
+}
+
+// 눈 깜빡임: 성체 원본 스프라이트의 눈 위치(viewBox 160 기준 x=50/90, y=60, 20x30)는
+// 모든 동물/새끼 스프라이트가 공유하는 좌표라, 얼굴색으로 덮는 사각형을 겹쳐 감았다
+// 뜨는 것처럼 보이게 한다(docs/mockups/pet-screen-mockup.html의 blink-eye 기법 이식).
+function BlinkEyes({ faceColor }) {
+  return (
+    <>
+      <div className="pet-blink-eye pet-blink-eye-left" style={{ background: faceColor }} />
+      <div className="pet-blink-eye pet-blink-eye-right" style={{ background: faceColor }} />
+    </>
+  );
 }
 
 const AMBIENT_SHOW_MS = 4000;
@@ -64,8 +78,13 @@ function Bubble({ text, wide }) {
 
 function PetView({ pet, reaction }) {
   const isHappy = pet.stage !== '알' && pet.stage !== '묘비' && pet.mood === '행복';
-  const walkFrame = useHappyWalkFrame(isHappy);
+  // 성체는 원본 스프라이트에 다리가 따로 그려져 있어 좌우 다리를 번갈아 들어올리는 3프레임
+  // 애니메이션을 적용할 수 있다(새끼는 몸통 아래가 평평해 다리 픽셀이 없어 적용 대상 아님).
+  const isWalkingAdult = pet.stage === '성체' && !isHappy;
+  const happyFrame = useFrameCycle(HAPPY_WALK_FRAMES.length, isHappy);
+  const legFrame = useFrameCycle(3, isWalkingAdult);
   const isSpotlight = !!reaction?.spotlight;
+  const faceColor = faceColorFor(pet.ear_type);
 
   const eggPool = eggDialoguePool(pet.egg_state);
   const moodPool = moodDialoguePool(pet.mood, pet.stage);
@@ -111,7 +130,11 @@ function PetView({ pet, reaction }) {
   }
 
   // 새끼/성체 공통: 베이스 스프라이트 + mood 오버레이(행복이면 걷기 프레임으로 대체) 합성.
-  const bodyUrl = isHappy ? HAPPY_WALK_FRAMES[walkFrame] : bodySpriteUrl(pet.stage, pet.ear_type);
+  const bodyUrl = isHappy
+    ? HAPPY_WALK_FRAMES[happyFrame]
+    : isWalkingAdult
+      ? adultWalkFrameUrl(pet.ear_type, legFrame)
+      : bodySpriteUrl(pet.stage, pet.ear_type);
   const overlayUrl = isHappy ? null : moodOverlayUrl(pet.mood);
   const bubbleText = reaction ? `${reaction.emoji} ${reaction.text}` : ambientMood;
 
@@ -144,6 +167,7 @@ function PetView({ pet, reaction }) {
                     style={{ position: 'absolute', inset: 0, imageRendering: 'pixelated' }}
                   />
                 )}
+                <BlinkEyes faceColor={faceColor} />
               </div>
             </div>
           </div>

@@ -6,7 +6,7 @@
     "version": "1.0.0"
   },
   "servers": [
-    { "url": "/api" }
+    { "url": "/" }
   ],
   "tags": [
     { "name": "auth", "description": "회원가입/로그인/토큰" },

@@ -327,19 +327,25 @@ a {
   padding-bottom: var(--space-2);
 }
 
+/* 펫 위치와 무관하게 씬 상단 가운데에 고정한다 - 펫을 따라다니게 했더니 문구가 길 때
+   씬 밖으로 삐져나가는 문제가 있어 분리했고, 길면 잘리지 않고 줄바꿈되게 한다. */
 .pet-bubble {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 24px);
   background: var(--paper);
   border: 2px solid var(--ink);
   border-radius: 8px;
   padding: 4px 10px;
-  margin: 0 0 24px; /* 펫 머리 위로 더 띄운다 */
   font-size: 13px;
-  white-space: nowrap;
+  white-space: normal;
+  text-align: center;
+  z-index: 1;
 }
 
-/* 펫 이동/통통 튀기(docs/mockups/pet-screen-mockup.html에서 그대로 이식). 말풍선을
-   .pet-wander 안에 같이 둬서 펫을 따라다니게 하고, 좌우 반전은 말풍선 글자가 뒤집히지
-   않도록 캐릭터 레이어(.pet-hop)에만 건다. */
+/* 펫 이동/통통 튀기(docs/mockups/pet-screen-mockup.html에서 그대로 이식). */
 .pet-wander {
   position: absolute;
   bottom: 16px;
@@ -348,6 +354,44 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* 운세(spotlight)를 보는 동안은 이동을 멈추고 가운데로 세운다. */
+.pet-wander-paused {
+  animation: none;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.pet-wander-paused .pet-hop,
+.pet-wander-paused .pet-bounce {
+  animation: none;
+}
+
+/* 운세 볼 때: 어두운 배경 한가운데 스포트라이트를 받는 느낌(배경 위에 어두운 비네트를
+   덧씌운다 - background는 자식 요소 위로 올라오지 않으므로 z-index 없이도 펫/말풍선이
+   항상 위에 보인다). */
+/* 초원 배경을 끄고 완전히 어둡게 한 뒤, 발밑에 픽셀 느낌의 계단형 조명 웅덩이를 얹는다.
+   부드러운 블러 대신 색상 띠를 딱딱 끊어서(하드 스탑) 픽셀로 찍은 조명처럼 보이게 한다. */
+.pet-scene-spotlight {
+  background:
+    /* 별(하드 엣지 픽셀 점) */
+    radial-gradient(circle 2px at 12% 18%, #fff, transparent 100%),
+    radial-gradient(circle 2px at 28% 32%, #fff, transparent 100%),
+    radial-gradient(circle 2px at 78% 15%, #fff, transparent 100%),
+    radial-gradient(circle 2px at 88% 30%, #fff, transparent 100%),
+    radial-gradient(circle 2px at 20% 55%, #fff, transparent 100%),
+    radial-gradient(circle 2px at 85% 55%, #fff, transparent 100%),
+    radial-gradient(circle 2px at 50% 12%, #fff, transparent 100%),
+    radial-gradient(circle 2px at 65% 40%, #fff, transparent 100%),
+    radial-gradient(
+      ellipse 60% 26% at 50% 82%,
+      #fff7cf 0% 30%,
+      #ffe9a8 30% 55%,
+      #cbb46a 55% 75%,
+      #05050a 75% 100%
+    ),
+    #05050a;
 }
 
 .pet-hop {

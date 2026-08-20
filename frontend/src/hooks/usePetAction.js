@@ -22,7 +22,16 @@ export function useFeedPet() {
 }
 
 export function useFeedSpecialFood() {
-  return usePetMutation(feedSpecialFood);
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: feedSpecialFood,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pet'] });
+      // 특식은 급여하면 소모되므로 보유 목록(FE-8의 특식 주기 선택 목록)도 재조회해야
+      // 방금 쓴 특식이 사라진다.
+      queryClient.invalidateQueries({ queryKey: ['myApplications'] });
+    },
+  });
 }
 
 export function usePatPet() {

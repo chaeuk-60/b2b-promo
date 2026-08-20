@@ -67,6 +67,17 @@ describe('PetActionButtons', () => {
     await waitFor(() => expect(specialButton).toBeDisabled());
   });
 
+  it('이미 급여해서 소모된(special_food_used_at 있음) 특식은 보유 목록에서 제외된다', async () => {
+    renderButtons(adultPet, [
+      { promotion_id: 1, title: '이미 준 특식', special_food_id: 'a', special_food_used_at: '2026-08-01T00:00:00.000Z' },
+    ]);
+
+    fireEvent.click(screen.getByRole('button', { name: /^밥/ }));
+    const specialButton = await screen.findByRole('button', { name: /특식 주기/ });
+    await waitFor(() => expect(specialButton).toBeDisabled());
+    expect(screen.getByText(/보유 특식 0개/)).toBeInTheDocument();
+  });
+
   it('보유 특식이 있으면 특식 주기에서 목록을 선택해 급여할 수 있다', async () => {
     feedSpecialFood.mockResolvedValue({});
     renderButtons(adultPet, [
@@ -105,7 +116,11 @@ describe('PetActionButtons', () => {
     fireEvent.click(fortuneButton);
 
     await waitFor(() =>
-      expect(onAction).toHaveBeenCalledWith({ emoji: '🍀', text: '오늘은 좋은 일이 생길 거예요' })
+      expect(onAction).toHaveBeenCalledWith({
+        emoji: '🍀',
+        text: '오늘은 좋은 일이 생길 거예요',
+        spotlight: true,
+      })
     );
   });
 
@@ -116,10 +131,10 @@ describe('PetActionButtons', () => {
     renderButtons(adultPet, [], onAction);
 
     fireEvent.click(screen.getByRole('button', { name: '목욕' }));
-    await waitFor(() => expect(onAction).toHaveBeenCalledWith({ emoji: '🫧', text: '뽀송뽀송' }));
+    await waitFor(() => expect(onAction).toHaveBeenCalledWith({ emoji: '🫧', text: '뽀송뽀송~' }));
 
     fireEvent.click(screen.getByRole('button', { name: '쓰다듬기' }));
-    await waitFor(() => expect(onAction).toHaveBeenCalledWith({ emoji: '❤️', text: '기분 좋아요~' }));
+    await waitFor(() => expect(onAction).toHaveBeenCalledWith({ emoji: '❤️', text: '완전 좋아요~' }));
   });
 
   it('특식을 급여하면 해당 특식 이모지+하트로 onAction이 호출된다', async () => {
@@ -141,6 +156,6 @@ describe('PetActionButtons', () => {
     await waitFor(() => expect(onAction).toHaveBeenCalled());
     const reaction = onAction.mock.calls[0][0];
     expect(reaction.emoji).toContain('❤️');
-    expect(reaction.text).toBe('완전 최고예요!!! 냠냠냠!!');
+    expect(reaction.text).toBe('완전 최고예요!!! 짱 냠냠 야미~!!');
   });
 });

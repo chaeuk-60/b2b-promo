@@ -28,8 +28,8 @@ function useHappyWalkFrame(isHappy) {
   return frame;
 }
 
-const AMBIENT_SHOW_MS = 5000;
-const AMBIENT_CYCLE_MS = 9000;
+const AMBIENT_SHOW_MS = 4000;
+const AMBIENT_CYCLE_MS = 20000;
 
 // 대사 목록에서 간간히 랜덤으로 하나를 골라 5초간 보여주고 끈다(1-domain-definition.md
 // "일상 대사"). reaction(행동 반응)이 떠 있는 동안은 겹치지 않도록 잠시 멈춘다.
@@ -65,9 +65,10 @@ function Bubble({ text }) {
 function PetView({ pet, reaction }) {
   const isHappy = pet.stage !== '알' && pet.stage !== '묘비' && pet.mood === '행복';
   const walkFrame = useHappyWalkFrame(isHappy);
+  const isSpotlight = !!reaction?.spotlight;
 
   const eggPool = eggDialoguePool(pet.egg_state);
-  const moodPool = moodDialoguePool(pet.mood);
+  const moodPool = moodDialoguePool(pet.mood, pet.stage);
   const ambientEgg = useAmbientLine(eggPool, pet.stage !== '알' || !!reaction);
   const ambientMood = useAmbientLine(moodPool, pet.stage === '알' || pet.stage === '묘비' || !!reaction);
 
@@ -91,7 +92,8 @@ function PetView({ pet, reaction }) {
         <p>이름: {pet.name}</p>
         <p>상태: {pet.egg_state}</p>
         <div className="pet-scene">
-          {/* 다리가 없어 좌우로 돌아다니지 못하고 제자리에서 흔들리는 idle 모션만 가진다 */}
+          {/* 다리가 없어 좌우로 돌아다니지 못하고 제자리에서 흔들리는 idle 모션만 가진다.
+              말풍선을 펫과 같이 묶어서 펫이 말하는 것처럼 보이게 한다(길면 줄바꿈). */}
           <div className="pet-egg-idle">
             <Bubble text={bubbleText} />
             <img
@@ -116,11 +118,12 @@ function PetView({ pet, reaction }) {
     <div>
       <p>이름: {pet.name}</p>
       <p>상태: {pet.mood}</p>
-      <div className="pet-scene">
-        {/* 말풍선을 pet-wander 안에 같이 둬서 펫을 따라다니게 하고, 좌우 반전은 말풍선
-            글자가 뒤집히지 않도록 캐릭터 레이어(pet-hop)에만 건다. */}
-        <div className="pet-wander">
-          <Bubble text={bubbleText} />
+      <div className={`pet-scene${isSpotlight ? ' pet-scene-spotlight' : ''}`}>
+        {/* 말풍선은 펫 위치와 무관하게 씬 상단 가운데 고정(길어지면 줄바꿈) - 펫을 따라
+            움직이게 했더니 문구가 길 때 씬 밖으로 삐져나가는 문제가 있어 분리했다.
+            운세(spotlight)일 때는 펫도 가운데로 멈춰 세운다. */}
+        <Bubble text={bubbleText} />
+        <div className={`pet-wander${isSpotlight ? ' pet-wander-paused' : ''}`}>
           <div className="pet-hop">
             <div className="pet-bounce">
               <div style={{ position: 'relative', width: 96, height: 96 }}>

@@ -214,8 +214,9 @@ async function feedSpecialFood(userId, promotionId, { random = Math.random } = {
   let pet = await getPet(userId);
   if (!pet || pet.stage === '묘비') return pet;
 
+  // 특식은 한 번 급여하면 소모된다(special_food_used_at IS NULL이어야 보유 중, 사용자 확인).
   const owned = await pool.query(
-    'SELECT 1 FROM applications WHERE user_id = $1 AND promotion_id = $2',
+    'SELECT 1 FROM applications WHERE user_id = $1 AND promotion_id = $2 AND special_food_used_at IS NULL',
     [userId, promotionId]
   );
   if (owned.rows.length === 0) {
@@ -224,6 +225,10 @@ async function feedSpecialFood(userId, promotionId, { random = Math.random } = {
       code: 'SPECIAL_FOOD_NOT_OWNED',
     });
   }
+  await pool.query(
+    'UPDATE applications SET special_food_used_at = now() WHERE user_id = $1 AND promotion_id = $2',
+    [userId, promotionId]
+  );
 
   const field = pet.stage === '알' ? 'egg_state' : 'mood';
   // pg는 BIGINT(requested_promotion_id)를 문자열로 반환하는데 promotionId는 JSON에서 숫자로 오므로,

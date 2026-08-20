@@ -10,16 +10,25 @@ import { useMyApplications } from '../../hooks/useMyApplications';
 import { foodEmoji } from '../../utils/foodEmoji';
 
 // 행동별 반응(말풍선에 잠깐 표시, PetPanel이 실제 타이머를 관리한다). 텍스트는 알
-// 단계에서는 안 쓰고 이모지만 보여준다(PetView가 stage로 판단).
-const REACTIONS = {
-  bathe: { emoji: '🫧', text: '뽀송뽀송' },
-  feed: { emoji: '🍚', text: '냠~' },
-  pat: { emoji: '❤️', text: '기분 좋아요~' },
+// 단계에서는 안 쓰고 이모지만 보여준다(PetView가 stage로 판단). 새끼는 아기 말투로
+// 짧게, 성체는 신난 느낌으로 길게 말한다(사용자 확인).
+const BABY_REACTIONS = {
+  bathe: { emoji: '🫧', text: '뽀득!' },
+  feed: { emoji: '🍚', text: '마시떠' },
+  pat: { emoji: '❤️', text: '조아' },
+};
+
+const ADULT_REACTIONS = {
+  bathe: { emoji: '🫧', text: '뽀송뽀송~' },
+  feed: { emoji: '🍚', text: '냠냠 맛있어요! 최고예요~' },
+  pat: { emoji: '❤️', text: '완전 좋아요~' },
 };
 
 function PetActionButtons({ pet, onAction }) {
+  const reactions = pet.stage === '새끼' ? BABY_REACTIONS : ADULT_REACTIONS;
+
   function notify(action) {
-    onAction?.(REACTIONS[action]);
+    onAction?.(reactions[action]);
   }
 
   const [showFeedMenu, setShowFeedMenu] = useState(false);
@@ -27,7 +36,8 @@ function PetActionButtons({ pet, onAction }) {
   const [selectedPromotionId, setSelectedPromotionId] = useState(null);
 
   const { data: applications } = useMyApplications();
-  const heldFoods = applications || [];
+  // 특식은 한 번 급여하면 소모되므로(special_food_used_at) 아직 안 쓴 것만 보유 목록에 남긴다.
+  const heldFoods = (applications || []).filter((a) => !a.special_food_used_at);
 
   const bathe = useBathePet();
   const feed = useFeedPet();
@@ -62,7 +72,7 @@ function PetActionButtons({ pet, onAction }) {
           setShowFeedMenu(false);
           onAction?.({
             emoji: `${foodEmoji(selected?.special_food_id)}❤️`,
-            text: '완전 최고예요!!! 냠냠냠!!',
+            text: pet.stage === '새끼' ? '우와 마시떠!!' : '완전 최고예요!!! 짱 냠냠 야미~!!',
           });
         },
       }
@@ -71,8 +81,9 @@ function PetActionButtons({ pet, onAction }) {
 
   function handleFortune() {
     fortune.mutate(undefined, {
-      // 오늘의 운세는 별도 문구가 아니라 펫이 직접 말풍선으로 말해준다.
-      onSuccess: (data) => onAction?.({ emoji: '🍀', text: data.message }),
+      // 오늘의 운세는 별도 문구가 아니라 펫이 직접 말풍선으로 말해준다. spotlight로
+      // 표시해서(가운데 고정 + 어두운 배경) 이동 중에도 안정적으로 읽을 수 있게 한다.
+      onSuccess: (data) => onAction?.({ emoji: '🍀', text: data.message, spotlight: true }),
     });
   }
 

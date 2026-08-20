@@ -91,6 +91,12 @@
           "id": { "type": "integer", "format": "int64" },
           "promotion_id": { "type": "integer", "format": "int64" },
           "applied_at": { "type": "string", "format": "date-time" },
+          "special_food_used_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "특식을 급여한 시각. null이면 아직 보유 중, 값이 있으면 이미 급여해 소모됨(1회성)"
+          },
           "title": { "type": "string" },
           "start_date": { "type": "string", "format": "date" },
           "end_date": { "type": "string", "format": "date" },
@@ -539,7 +545,7 @@
       "post": {
         "tags": ["pet"],
         "summary": "펫 특식 주기",
-        "description": "보유 중인 특식(신청 완료한 프로모션 기준)이 1개 이상일 때만 가능하며, 여러 개 보유 시 급여할 프로모션을 지정한다. mood/eggState가 '특식 요청'이고 대상(requestedPromotionId)과 일치하면 무지개로 변화. 그 외 자발적 급여는 50% 확률로 진화, 50% 확률로 반짝이로 변화(둘 중 하나는 항상 발생). '밥'과는 완전히 분리된 별도 엔드포인트다.",
+        "description": "보유 중인 특식(신청 완료했고 아직 급여하지 않은 프로모션 기준, applications.special_food_used_at IS NULL)이 1개 이상일 때만 가능하며, 여러 개 보유 시 급여할 프로모션을 지정한다. 급여하면 해당 특식은 소모되어(special_food_used_at 기록) 다시 줄 수 없다. mood/eggState가 '특식 요청'이고 대상(requestedPromotionId)과 일치하면 무지개로 변화. 그 외 자발적 급여는 50% 확률로 진화, 50% 확률로 반짝이로 변화(둘 중 하나는 항상 발생). '밥'과는 완전히 분리된 별도 엔드포인트다.",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,

@@ -31,10 +31,11 @@ CREATE TABLE promotions (
 );
 
 CREATE TABLE applications (
-    id            BIGSERIAL PRIMARY KEY,
-    user_id       BIGINT NOT NULL REFERENCES users(id),
-    promotion_id  BIGINT NOT NULL REFERENCES promotions(id),
-    applied_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    id                     BIGSERIAL PRIMARY KEY,
+    user_id                BIGINT NOT NULL REFERENCES users(id),
+    promotion_id           BIGINT NOT NULL REFERENCES promotions(id),
+    applied_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+    special_food_used_at   TIMESTAMPTZ, -- NULL이면 특식 보유 중, 값이 있으면 이미 급여해 소모됨(1회성)
     UNIQUE (user_id, promotion_id) -- 중복 신청 방지(도메인 정의서 7장)
 );
 

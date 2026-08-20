@@ -45,7 +45,19 @@ const EGG_DIALOGUE = {
   '특식 요청': ['(꼼지락꼼지락)', '(꼬르륵)'],
 };
 
-const MOOD_DIALOGUE = {
+// 새끼는 아기 말투로 짧게, 성체는 완전한 문장으로 말한다(사용자 확인).
+const BABY_MOOD_DIALOGUE = {
+  평범: ['조아', '헤헤', '음냐~'],
+  더러움: ['근질근질..', '더러워따'],
+  배고픔: ['배고파따', '맘마 조'],
+  삐짐: ['삐짐!', '흥이다'],
+  행복: ['신나따!', '조아조아'],
+  무지개: ['우와아', '예뻐따'],
+  반짝이: ['반짝반짝', '나빛나'],
+  '특식 요청': ['마시써..', '그거 조'],
+};
+
+const ADULT_MOOD_DIALOGUE = {
   평범: ['오늘도 좋은 하루예요', '뭐하고 놀까요?', '(콧노래)'],
   더러움: ['몸이 근질근질해요...', '씻고 싶어요'],
   배고픔: ['꼬르륵... 배고파요', '밥 주세요!'],
@@ -64,8 +76,9 @@ export function eggDialoguePool(eggState) {
   return EGG_DIALOGUE[eggState] || EGG_DIALOGUE['평범'];
 }
 
-export function moodDialoguePool(mood) {
-  return MOOD_DIALOGUE[mood] || MOOD_DIALOGUE['평범'];
+export function moodDialoguePool(mood, stage) {
+  const table = stage === '새끼' ? BABY_MOOD_DIALOGUE : ADULT_MOOD_DIALOGUE;
+  return table[mood] || table['평범'];
 }
 
 export function pickDialogue(pool) {

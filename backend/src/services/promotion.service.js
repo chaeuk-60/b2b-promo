@@ -132,7 +132,7 @@ async function toggleFavorite(userId, promotionId) {
 // applications 원본 행만으로는 부족하다 - promotions를 조인해 필요한 필드를 함께 내려준다.
 async function listMyApplications(userId) {
   const { rows } = await pool.query(
-    `SELECT a.id, a.promotion_id, a.applied_at,
+    `SELECT a.id, a.promotion_id, a.applied_at, a.special_food_used_at,
             p.title, p.start_date, p.end_date, p.special_food_id
        FROM applications a
        JOIN promotions p ON p.id = a.promotion_id

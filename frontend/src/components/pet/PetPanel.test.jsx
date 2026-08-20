@@ -56,10 +56,10 @@ describe('PetPanel', () => {
     await screen.findByText('이름: 김커푸');
     fireEvent.click(screen.getByRole('button', { name: '쓰다듬기' }));
 
-    await waitFor(() => expect(screen.getByText('❤️ 기분 좋아요~')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('❤️ 완전 좋아요~')).toBeInTheDocument());
 
     vi.advanceTimersByTime(4500);
-    await waitFor(() => expect(screen.queryByText('❤️ 기분 좋아요~')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('❤️ 완전 좋아요~')).not.toBeInTheDocument());
 
     vi.useRealTimers();
   });

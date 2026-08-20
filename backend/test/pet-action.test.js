@@ -233,6 +233,38 @@ test('특식 요청 상태에서 대상 특식을 급여하면 무지개로 바�
   assert.equal(result.requested_promotion_id, null);
 });
 
+test('특식은 한 번 급여하면 소모되어 같은 프로모션으로 다시 급여할 수 없다', async (t) => {
+  const app = buildApp();
+  const email = uniqueEmail();
+  let userId;
+  let promotionId;
+  t.after(async () => {
+    await cleanupPromotion(promotionId);
+    await cleanupUser(userId);
+  });
+
+  const adminToken = await loginAsAdmin(app, t);
+  promotionId = await createPromotion(app, adminToken);
+
+  const login = await signupAndLogin(app, email, 'password123');
+  userId = login.body.user.id;
+
+  await request(app)
+    .post(`/promotions/${promotionId}/apply`)
+    .set('Authorization', `Bearer ${login.body.accessToken}`);
+
+  await petService.feedSpecialFood(userId, promotionId, { random: () => 0.9 });
+
+  await assert.rejects(
+    () => petService.feedSpecialFood(userId, promotionId, { random: () => 0.9 }),
+    (err) => {
+      assert.equal(err.status, 400);
+      assert.equal(err.code, 'SPECIAL_FOOD_NOT_OWNED');
+      return true;
+    }
+  );
+});
+
 test('특식 요청 상태가 아닐 때 자발적 급여 + random 높은 값이면 반짝이로 바뀐다', async (t) => {
   const app = buildApp();
   const email = uniqueEmail();

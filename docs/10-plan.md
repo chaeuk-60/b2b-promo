@@ -13,7 +13,7 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - `9-schema.sql`(users, refresh_tokens, promotions, applications, favorites, pets)을 `backend/src/db/migrations/001_init.sql`로 그대로 옮겨 배치한다.
 - `9-schema.sql` 내용을 변경하지 않는다(제약조건으로 이미 1:1, 중복신청 방지, 찜 복합키가 해결되어 있으므로 앱 코드 검증을 추가하지 않는다).
 - 로컬 PostgreSQL 17에 실제로 적용해 테이블 6개가 생성되는지 확인한다.
-- BE 작업 중 뒤늦게 필요해진 컬럼(daily_login_count, fortune_message, fortune_date)과 FK 제약 조정(requested_promotion_id ON DELETE SET NULL)은 `9-schema.sql`에도 반영하고, `002_pet_daily_login_count.sql`/`003_pets_requested_promotion_fk_set_null.sql`/`004_pet_fortune.sql` 후속 마이그레이션으로 나눠 적용한다(001_init.sql은 최초 버전으로 유지, 되돌리지 않는다).
+- BE 작업 중 뒤늦게 필요해진 컬럼(daily_login_count, fortune_message, fortune_date, applications.special_food_used_at)과 FK 제약 조정(requested_promotion_id ON DELETE SET NULL)은 `9-schema.sql`에도 반영하고, `002_pet_daily_login_count.sql`/`003_pets_requested_promotion_fk_set_null.sql`/`004_pet_fortune.sql`/`005_applications_special_food_used_at.sql` 후속 마이그레이션으로 나눠 적용한다(001_init.sql은 최초 버전으로 유지, 되돌리지 않는다).
 - 선행: 없음
 - 완료 조건:
   - [x] `backend/src/db/migrations/001_init.sql` 파일이 최초 버전 `9-schema.sql`과 동일한 내용으로 생성되어 있고, 이후 스키마 변경은 002~004 후속 마이그레이션으로 관리된다.

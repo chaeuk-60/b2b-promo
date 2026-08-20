@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const pool = require('../db/pool');
+const petService = require('./pet.service');
 
 // 도메인 정의서 2장의 귀 타입 5종. 알 단계에서는 시각적으로 쓰이지 않지만
 // pets.ear_type 컬럼이 NOT NULL이라 가입 시점에 미리 랜덤 배정해둔다.
@@ -84,9 +85,13 @@ async function login({ email, password }) {
   const accessToken = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_ACCESS_SECRET, {
     expiresIn: '15m',
   });
-  const refreshToken = jwt.sign({ sub: user.id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: '14d',
-  });
+  // jti(무작위 토큰 ID)를 넣지 않으면 같은 초 안에 재로그인 시 payload/발급시각/만료시각이 모두 같아
+  // 리프레시 토큰 JWT 문자열이 완전히 동일해지고, token_hash UNIQUE 제약을 위반한다.
+  const refreshToken = jwt.sign(
+    { sub: user.id, jti: crypto.randomBytes(16).toString('hex') },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: '14d' }
+  );
 
   const tokenHash = hashToken(refreshToken);
   await pool.query(
@@ -94,9 +99,9 @@ async function login({ email, password }) {
     [user.id, tokenHash]
   );
 
-  // TODO(BE-5): resolveMoodOnLogin(user.id) 호출 지점 — mood/eggState 하루 단위 리셋은 이번 태스크(BE-2) 범위 아님
+  const pet = await petService.resolveMoodOnLogin(user.id);
 
-  return { accessToken, refreshToken, user: { id: user.id, email: user.email } };
+  return { accessToken, refreshToken, user: { id: user.id, email: user.email }, pet };
 }
 
 async function refreshAccessToken({ refreshToken }) {

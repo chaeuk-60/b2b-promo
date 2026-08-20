@@ -30,13 +30,13 @@ async function signup(req, res, next) {
 async function login(req, res, next) {
   try {
     const { email, password } = req.body;
-    const { accessToken, refreshToken, user } = await authService.login({ email, password });
+    const { accessToken, refreshToken, user, pet } = await authService.login({ email, password });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'lax',
       maxAge: REFRESH_TOKEN_MAX_AGE_MS,
     });
-    res.status(200).json({ accessToken, user });
+    res.status(200).json({ accessToken, user, pet });
   } catch (err) {
     next(err);
   }

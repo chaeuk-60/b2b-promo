@@ -40,18 +40,30 @@
 
 ## 4. 픽셀 테두리 & 모서리
 
-- 모든 카드/버튼/입력창: `border: 3px solid var(--ink)`. `border-radius`는 완전히 둥글리지 않고 **8px 이하로 살짝만**(알약형 버튼 제외) — 각지고 픽셀스러운 느낌 유지.
-- 그림자 대신 **하드 섀도우**(픽셀 블록 그림자)를 쓴다: `box-shadow: 4px 4px 0 var(--ink);`. blur 없이 순수 오프셋만. hover/active 시 오프셋을 줄여 "눌리는" 느낌을 준다.
+- 모든 카드/입력창/보조 버튼은 `border-radius`로 둥글리지 않는다(알약형 버튼 제외). 대신 네 모서리를 계단형으로 잘라내는 **픽셀 노치**를 `clip-path: polygon(...)`으로 적용해 "픽셀 찍은 것 같은" 각진 모서리를 만든다(단순 직사각형이 아니라 모서리가 한 칸 꺾여 들어간 모양).
   ```css
-  .pixel-card { box-shadow: 4px 4px 0 var(--ink); }
-  .pixel-btn:active { box-shadow: 1px 1px 0 var(--ink); transform: translate(3px, 3px); }
+  :root {
+    --pixel-notch: 6px;
+    --pixel-corners: polygon(
+      0 var(--pixel-notch), var(--pixel-notch) var(--pixel-notch), var(--pixel-notch) 0,
+      calc(100% - var(--pixel-notch)) 0, calc(100% - var(--pixel-notch)) var(--pixel-notch), 100% var(--pixel-notch),
+      100% calc(100% - var(--pixel-notch)), calc(100% - var(--pixel-notch)) calc(100% - var(--pixel-notch)), calc(100% - var(--pixel-notch)) 100%,
+      var(--pixel-notch) 100%, var(--pixel-notch) calc(100% - var(--pixel-notch)), 0 calc(100% - var(--pixel-notch))
+    );
+  }
+  .pixel-card, .pixel-btn, .pixel-input { clip-path: var(--pixel-corners); }
+  ```
+- 그림자는 **하드 섀도우**(픽셀 블록 그림자)를 쓰되, `box-shadow`는 `clip-path`로 잘린 모양을 따라가지 않으므로 `filter: drop-shadow(...)`를 쓴다. blur 없이 순수 오프셋만. hover/active 시 오프셋을 줄여 "눌리는" 느낌을 준다.
+  ```css
+  .pixel-card { filter: drop-shadow(4px 4px 0 var(--ink)); }
+  .pixel-btn:active { filter: drop-shadow(1px 1px 0 var(--ink)); transform: translate(3px, 3px); }
   ```
 - `image-rendering: pixelated`를 펫 스프라이트 `<img>`/`<canvas>`에 적용해 확대 시 뭉개지지 않게 한다.
 
 ## 5. 버튼
 
-- **주요 버튼**(신청하기, 확인, 로그인): 알약형(`border-radius: 999px`) + `--accent-green` 배경 + `--ink` 3px 테두리 + 하드 섀도우. 레퍼런스의 초록 "START" 버튼과 동일 톤.
-- **보조 버튼**(건너뛰기, 취소): 흰 배경 + `--ink` 테두리, 섀도우 없음(덜 강조).
+- **주요 버튼**(신청하기, 확인, 로그인): 알약형(`border-radius: 999px`, `clip-path: none`) + `--accent-green` 배경 + `--ink` 3px 테두리 + 하드 섀도우. 레퍼런스의 초록 "START" 버튼과 동일 톤. 알약형은 픽셀 노치 예외.
+- **보조 버튼**(건너뛰기, 취소): 흰 배경 + `--ink` 테두리 + 픽셀 노치 모서리, 하드 섀도우는 주요 버튼보다 덜 강조되도록 유지.
 - **비활성 버튼**(기간 종료): `--muted` 배경, 테두리 흐리게, 커서 `not-allowed`, 섀도우 제거(눌려있는 듯).
 - **찜 버튼**: 하트 아이콘(♥/♡)만 크게, 눌렀을 때 살짝 튀는 애니메이션(`transform: scale(1.2)` → `1`, 150ms).
 

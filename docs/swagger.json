@@ -64,7 +64,15 @@
           "start_date": { "type": "string", "format": "date" },
           "end_date": { "type": "string", "format": "date" },
           "content": { "type": "string" },
-          "special_food_id": { "type": "string" }
+          "special_food_id": { "type": "string" },
+          "favorited": {
+            "type": "boolean",
+            "description": "요청한 사용자가 이 프로모션을 찜했는지 여부(목록/상세 조회에서만 포함됨)"
+          },
+          "applied": {
+            "type": "boolean",
+            "description": "요청한 사용자가 이 프로모션에 신청 완료했는지 여부(목록/상세 조회에서만 포함됨)"
+          }
         }
       },
       "Application": {
@@ -256,6 +264,7 @@
       "get": {
         "tags": ["promotion"],
         "summary": "프로모션 목록 조회",
+        "description": "각 프로모션에 요청한 사용자 기준 favorited(찜 여부)/applied(신청 완료 여부)가 함께 내려온다.",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
@@ -309,6 +318,7 @@
       "get": {
         "tags": ["promotion"],
         "summary": "프로모션 상세 조회",
+        "description": "요청한 사용자 기준 favorited(찜 여부)/applied(신청 완료 여부)가 함께 내려온다.",
         "security": [{ "bearerAuth": [] }],
         "parameters": [
           { "name": "promotionId", "in": "path", "required": true, "schema": { "type": "integer", "format": "int64" } }

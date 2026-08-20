@@ -3,7 +3,7 @@ const promotionService = require('../services/promotion.service');
 
 async function list(req, res, next) {
   try {
-    const promotions = await promotionService.listPromotions();
+    const promotions = await promotionService.listPromotions(req.user.id);
     res.status(200).json(promotions);
   } catch (err) {
     next(err);
@@ -12,7 +12,10 @@ async function list(req, res, next) {
 
 async function getOne(req, res, next) {
   try {
-    const promotion = await promotionService.getPromotion(req.params.promotionId);
+    const promotion = await promotionService.getPromotionForUser(
+      req.params.promotionId,
+      req.user.id
+    );
     if (!promotion) {
       return next(
         Object.assign(new Error('프로모션을 찾을 수 없습니다.'), {

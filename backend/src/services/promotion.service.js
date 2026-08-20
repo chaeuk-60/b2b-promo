@@ -1,13 +1,35 @@
 // 프로모션 도메인 로직: 목록/상세/등록/수정/신청/찜 (10-plan.md BE-4)
 const pool = require('../db/pool');
 
-async function listPromotions() {
-  const { rows } = await pool.query('SELECT * FROM promotions ORDER BY id');
+// 목록/상세 조회는 프론트에서 찜(♡/♥)·신청 완료 상태를 바로 표시할 수 있도록
+// favorited/applied를 함께 내려준다(해당 사용자 기준). 내부 존재 확인용(getPromotion)은
+// 이 두 필드가 필요 없는 호출부(applyToPromotion/toggleFavorite/updatePromotion)에서 계속 쓴다.
+async function listPromotions(userId) {
+  const { rows } = await pool.query(
+    `SELECT p.*,
+            EXISTS(SELECT 1 FROM favorites f WHERE f.promotion_id = p.id AND f.user_id = $1) AS favorited,
+            EXISTS(SELECT 1 FROM applications a WHERE a.promotion_id = p.id AND a.user_id = $1) AS applied
+       FROM promotions p
+      ORDER BY p.id`,
+    [userId]
+  );
   return rows;
 }
 
 async function getPromotion(promotionId) {
   const { rows } = await pool.query('SELECT * FROM promotions WHERE id = $1', [promotionId]);
+  return rows[0] || null;
+}
+
+async function getPromotionForUser(promotionId, userId) {
+  const { rows } = await pool.query(
+    `SELECT p.*,
+            EXISTS(SELECT 1 FROM favorites f WHERE f.promotion_id = p.id AND f.user_id = $2) AS favorited,
+            EXISTS(SELECT 1 FROM applications a WHERE a.promotion_id = p.id AND a.user_id = $2) AS applied
+       FROM promotions p
+      WHERE p.id = $1`,
+    [promotionId, userId]
+  );
   return rows[0] || null;
 }
 
@@ -117,6 +139,7 @@ async function listMyApplications(userId) {
 module.exports = {
   listPromotions,
   getPromotion,
+  getPromotionForUser,
   createPromotion,
   updatePromotion,
   applyToPromotion,

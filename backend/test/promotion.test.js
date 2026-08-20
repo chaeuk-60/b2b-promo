@@ -295,6 +295,54 @@ test('찜 토글: 처음 호출 시 favorited:true, 다시 호출하면 favorite
   assert.equal(secondToggle.body.favorited, false);
 });
 
+test('GET /promotions와 GET /promotions/:id는 요청한 사용자 기준 favorited/applied를 함께 내려준다', async (t) => {
+  const app = buildApp();
+  const email = uniqueEmail();
+  let userId;
+  let promotionId;
+
+  t.after(async () => {
+    await cleanupPromotion(promotionId);
+    await cleanupUser(userId);
+  });
+
+  const adminToken = await loginAsAdmin(app, t);
+  const createRes = await request(app)
+    .post('/promotions')
+    .set('Authorization', `Bearer ${adminToken}`)
+    .send({
+      title: 'favorited/applied 테스트 프로모션',
+      start_date: '2026-08-01',
+      end_date: '2026-12-31',
+      content: '내용',
+      special_food_id: 'test-food',
+    });
+  promotionId = createRes.body.id;
+
+  const login = await signupAndLogin(app, email, 'password123');
+  userId = login.body.user.id;
+  const authHeader = `Bearer ${login.body.accessToken}`;
+
+  const beforeList = await request(app).get('/promotions').set('Authorization', authHeader);
+  const beforeItem = beforeList.body.find((p) => String(p.id) === String(promotionId));
+  assert.equal(beforeItem.favorited, false);
+  assert.equal(beforeItem.applied, false);
+
+  await request(app).post(`/promotions/${promotionId}/favorite`).set('Authorization', authHeader);
+  await request(app).post(`/promotions/${promotionId}/apply`).set('Authorization', authHeader);
+
+  const afterDetail = await request(app)
+    .get(`/promotions/${promotionId}`)
+    .set('Authorization', authHeader);
+  assert.equal(afterDetail.body.favorited, true);
+  assert.equal(afterDetail.body.applied, true);
+
+  const afterList = await request(app).get('/promotions').set('Authorization', authHeader);
+  const afterItem = afterList.body.find((p) => String(p.id) === String(promotionId));
+  assert.equal(afterItem.favorited, true);
+  assert.equal(afterItem.applied, true);
+});
+
 test('신청 완료한 프로모션이 GET /applications(나의 신청 목록)에 포함된다', async (t) => {
   const app = buildApp();
   const email = uniqueEmail();

@@ -1,6 +1,9 @@
 const createApp = require('./app');
+const authRoutes = require('./routes/auth.routes');
 
-const app = createApp();
+const app = createApp((app) => {
+  app.use('/auth', authRoutes);
+});
 const port = process.env.PORT || 3000;
 
 app.listen(port, () => {

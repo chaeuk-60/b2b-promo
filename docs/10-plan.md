@@ -140,8 +140,8 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - `frontend/src/pages/`에 이름 짓기 화면(선택 입력 + 건너뛰기/확인 버튼, `8-wireframe.md` 2번)을 만들고, 최초 로그인/사망 후 새 알/성체 순환 후 새 알 상황에서 노출되도록 연결한다.
 - 선행: BE-5, FE-2
 - 완료 조건:
-  - [ ] 이름을 입력하고 확인하면 펫 이름이 반영된 상태로 목록 화면으로 이동한다.
-  - [ ] 건너뛰기를 누르면 기본 이름으로 목록 화면으로 이동한다.
+  - [x] 이름을 입력하고 확인하면 펫 이름이 반영된 상태로 목록 화면으로 이동한다.
+  - [x] 건너뛰기를 누르면 기본 이름으로 목록 화면으로 이동한다.
 
 ### FE-4. 프로모션 목록 화면
 - `frontend/src/api/promotion.api.js`, `frontend/src/hooks/usePromotions.js`(목록 useQuery), `frontend/src/hooks/useToggleFavorite.js`(useMutation).

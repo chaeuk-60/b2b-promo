@@ -9,3 +9,23 @@ export function getPet() {
 export function namePet({ name }) {
   return client.patch('/pet/name', { name }).then((res) => res.data);
 }
+
+export function bathePet() {
+  return client.post('/pet/bathe').then((res) => res.data);
+}
+
+export function feedPet() {
+  return client.post('/pet/feed').then((res) => res.data);
+}
+
+export function feedSpecialFood({ promotionId }) {
+  return client.post('/pet/feed-special-food', { promotionId }).then((res) => res.data);
+}
+
+export function patPet() {
+  return client.post('/pet/pat').then((res) => res.data);
+}
+
+export function fetchFortune() {
+  return client.post('/pet/fortune').then((res) => res.data);
+}

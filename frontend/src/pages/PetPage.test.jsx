@@ -8,9 +8,18 @@ import PetPage from './PetPage';
 vi.mock('../api/pet.api', () => ({
   getPet: vi.fn(),
   namePet: vi.fn(),
+  bathePet: vi.fn(),
+  feedPet: vi.fn(),
+  feedSpecialFood: vi.fn(),
+  patPet: vi.fn(),
+  fetchFortune: vi.fn(),
+}));
+vi.mock('../api/application.api', () => ({
+  listMyApplications: vi.fn(),
 }));
 
 import { getPet } from '../api/pet.api';
+import { listMyApplications } from '../api/application.api';
 
 function renderPage() {
   const queryClient = new QueryClient();
@@ -26,6 +35,7 @@ function renderPage() {
 describe('PetPage', () => {
   it('펫 조회 성공 시 이름이 표시된다', async () => {
     getPet.mockResolvedValue({ stage: '알', egg_state: '평범', name: '김커푸' });
+    listMyApplications.mockResolvedValue([]);
     renderPage();
 
     expect(await screen.findByText('이름: 김커푸')).toBeInTheDocument();

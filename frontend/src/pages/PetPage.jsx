@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { usePet } from '../hooks/usePet';
 import PetView from '../components/pet/PetView';
+import PetActionButtons from '../components/pet/PetActionButtons';
 
 function PetPage() {
   const { data: pet, isLoading, isError } = usePet();
@@ -13,6 +14,7 @@ function PetPage() {
     <div>
       <Link to="/promotions">{'< 프로모션 목록'}</Link>
       <PetView pet={pet} />
+      <PetActionButtons pet={pet} />
     </div>
   );
 }

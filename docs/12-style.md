@@ -40,33 +40,44 @@
 
 ## 4. 픽셀 테두리 & 모서리
 
-- **카드/버튼**(주요·보조·찜 구분 없이)은 `border-radius`로 둥글리지 않는다. 대신 네 모서리를 계단형으로 잘라내는 **픽셀 노치**를 `clip-path: polygon(...)`으로 적용해 "픽셀 찍은 것 같은" 각진 모서리를 만든다(단순 직사각형이 아니라 모서리가 한 칸 꺾여 들어간 모양). 버튼 종류 구분은 모양이 아니라 배경색으로만 한다 - 모양/높이가 버튼마다 다르면 오히려 일관성이 깨져 보인다.
+- **카드/버튼**(주요·보조·찜 구분 없이)은 `border-radius`로 둥글리지 않는다. 대신 네 모서리를 계단형으로 잘라내는 **픽셀 노치**를 `clip-path: polygon(...)`으로 적용해 "픽셀 찍은 것 같은" 각진 모서리를 만든다(1단만 자르면 그냥 대각선 모서리처럼 보이므로 반드시 2단 이상으로 꺾는다). 단, **카드는 2단**, **버튼은 카드보다 작으므로 1단**만 자른다(버튼에 2단을 그대로 쓰면 꺾임이 상대적으로 너무 두꺼워 보임) - 버튼의 1단 두께는 카드 2단 중 한 칸(`--pixel-notch-half`)과 맞춘다. 버튼 종류 구분은 모양이 아니라 배경색으로만 한다 - 모양/높이가 버튼마다 다르면 오히려 일관성이 깨져 보인다.
   ```css
   :root {
-    --pixel-notch: 6px;
+    --pixel-notch: 10px;
+    --pixel-notch-half: calc(var(--pixel-notch) / 2);
     --pixel-border: 3px;
     --pixel-corners: polygon(
-      0 var(--pixel-notch), var(--pixel-notch) var(--pixel-notch), var(--pixel-notch) 0,
-      calc(100% - var(--pixel-notch)) 0, calc(100% - var(--pixel-notch)) var(--pixel-notch), 100% var(--pixel-notch),
-      100% calc(100% - var(--pixel-notch)), calc(100% - var(--pixel-notch)) calc(100% - var(--pixel-notch)), calc(100% - var(--pixel-notch)) 100%,
-      var(--pixel-notch) 100%, var(--pixel-notch) calc(100% - var(--pixel-notch)), 0 calc(100% - var(--pixel-notch))
+      0 var(--pixel-notch), var(--pixel-notch-half) var(--pixel-notch), var(--pixel-notch-half) var(--pixel-notch-half),
+      var(--pixel-notch) var(--pixel-notch-half), var(--pixel-notch) 0,
+      calc(100% - var(--pixel-notch)) 0, calc(100% - var(--pixel-notch)) var(--pixel-notch-half),
+      calc(100% - var(--pixel-notch-half)) var(--pixel-notch-half), calc(100% - var(--pixel-notch-half)) var(--pixel-notch), 100% var(--pixel-notch),
+      100% calc(100% - var(--pixel-notch)), calc(100% - var(--pixel-notch-half)) calc(100% - var(--pixel-notch)),
+      calc(100% - var(--pixel-notch-half)) calc(100% - var(--pixel-notch-half)), calc(100% - var(--pixel-notch)) calc(100% - var(--pixel-notch-half)), calc(100% - var(--pixel-notch)) 100%,
+      var(--pixel-notch) 100%, var(--pixel-notch) calc(100% - var(--pixel-notch-half)),
+      var(--pixel-notch-half) calc(100% - var(--pixel-notch-half)), var(--pixel-notch-half) calc(100% - var(--pixel-notch)), 0 calc(100% - var(--pixel-notch))
     );
+    /* 버튼용 1단 노치: 위 2단 패턴에서 "반 칸"(--pixel-notch-half) 하나만 잘라낸 버전.
+       좌표는 --pixel-notch 자리에 --pixel-notch-half를 넣은 동일한 12점 polygon. */
+    --pixel-corners-btn: polygon(/* ... 위와 동일한 형태, --pixel-notch-half 기준 1단 ... */);
   }
   ```
-- **주의**: `border` 속성은 `clip-path`가 잘라낸 대각선 모서리를 따라가지 못해서, 노치 모서리마다 테두리가 끊기고 빈틈이 생긴다(모서리가 "연결이 안 되는" 문제). 그래서 `border`를 쓰지 않고, "바깥은 잉크색 도형 전체, 그 위에 `--pixel-border`(3px)만큼 안쪽으로 종이색 도형을 겹쳐서" 테두리처럼 보이게 한다 - 안쪽 도형도 같은 `--pixel-corners`를 쓰므로 모서리가 안팎 모두 끊김 없이 이어진다.
+- **주의**: `border` 속성은 `clip-path`가 잘라낸 대각선 모서리를 따라가지 못해서, 노치 모서리마다 테두리가 끊기고 빈틈이 생긴다(모서리가 "연결이 안 되는" 문제). 그래서 `border`를 쓰지 않고, "바깥은 잉크색 도형 전체, 그 위에 `--pixel-border`(3px)만큼 안쪽으로 종이색 도형을 겹쳐서" 테두리처럼 보이게 한다 - 안쪽 도형도 같은 clip-path를 쓰므로 모서리가 안팎 모두 끊김 없이 이어진다. `<button>`/`<a>`는 기본 UA 테두리가 있으므로 `border: none`을 명시로 지워야 한다(안 지우면 회색 테두리가 겹쳐 보인다).
   ```css
   .pixel-card, .pixel-btn {
     position: relative;
     isolation: isolate; /* ::before의 z-index:-1이 카드 밖으로 새지 않게 가둔다 */
+    border: none;
     background: var(--ink); /* 잉크색이 곧 "테두리" */
-    clip-path: var(--pixel-corners);
   }
+  .pixel-card { clip-path: var(--pixel-corners); }       /* 카드: 2단 */
+  .pixel-btn { clip-path: var(--pixel-corners-btn); }    /* 버튼: 1단 */
   .pixel-card::before, .pixel-btn::before {
     content: '';
     position: absolute;
     inset: var(--pixel-border); /* 테두리 두께만큼 안쪽으로 */
     background: var(--paper); /* 종류별로 여기 배경색만 바꾸면 됨(예: 주요 버튼은 --accent-green) */
-    clip-path: var(--pixel-corners);
+    /* 바깥과 같은 clip-path를 각각 써야 한다: .pixel-card::before는 --pixel-corners,
+       .pixel-btn::before는 --pixel-corners-btn */
     z-index: -1;
   }
   ```

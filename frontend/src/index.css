@@ -18,22 +18,54 @@
   /* 도트 폰트 라이선스/로딩 이슈를 피해 모노스페이스로 픽셀 느낌만 낸다(12-style.md 참조 - 웹폰트는 스킵) */
   --font-pixel: 'Courier New', ui-monospace, Consolas, monospace;
 
-  /* 둥근 border-radius 대신 네 모서리를 계단형으로 잘라내는 "픽셀 노치" 모양(카드/버튼/입력창 공통) */
-  --pixel-notch: 8px;
+  /* 둥근 border-radius 대신 네 모서리를 2단 계단형으로 잘라내는 "픽셀 노치" 모양
+     (카드/버튼 공통). 계단을 1단만 주면 그냥 대각선 모서리처럼 보여서 2단으로 구성한다:
+     한 모서리당 (가장자리 -> 반칸 이동 -> 반칸 이동 -> 반칸 이동 -> 가장자리)로 "ㄱ"자를
+     두 번 꺾는다. */
+  --pixel-notch: 10px;
+  --pixel-notch-half: calc(var(--pixel-notch) / 2);
   --pixel-border: 3px;
   --pixel-corners: polygon(
     0 var(--pixel-notch),
-    var(--pixel-notch) var(--pixel-notch),
+    var(--pixel-notch-half) var(--pixel-notch),
+    var(--pixel-notch-half) var(--pixel-notch-half),
+    var(--pixel-notch) var(--pixel-notch-half),
     var(--pixel-notch) 0,
+
     calc(100% - var(--pixel-notch)) 0,
-    calc(100% - var(--pixel-notch)) var(--pixel-notch),
+    calc(100% - var(--pixel-notch)) var(--pixel-notch-half),
+    calc(100% - var(--pixel-notch-half)) var(--pixel-notch-half),
+    calc(100% - var(--pixel-notch-half)) var(--pixel-notch),
     100% var(--pixel-notch),
+
     100% calc(100% - var(--pixel-notch)),
-    calc(100% - var(--pixel-notch)) calc(100% - var(--pixel-notch)),
+    calc(100% - var(--pixel-notch-half)) calc(100% - var(--pixel-notch)),
+    calc(100% - var(--pixel-notch-half)) calc(100% - var(--pixel-notch-half)),
+    calc(100% - var(--pixel-notch)) calc(100% - var(--pixel-notch-half)),
     calc(100% - var(--pixel-notch)) 100%,
+
     var(--pixel-notch) 100%,
-    var(--pixel-notch) calc(100% - var(--pixel-notch)),
+    var(--pixel-notch) calc(100% - var(--pixel-notch-half)),
+    var(--pixel-notch-half) calc(100% - var(--pixel-notch-half)),
+    var(--pixel-notch-half) calc(100% - var(--pixel-notch)),
     0 calc(100% - var(--pixel-notch))
+  );
+
+  /* 버튼은 카드보다 작아서 2단 계단을 그대로 쓰면 꺾임이 상대적으로 너무 두꺼워 보인다.
+     그래서 버튼은 위 2단 계단의 "한 칸" 두께(--pixel-notch-half)만큼만 1단으로 자른다. */
+  --pixel-corners-btn: polygon(
+    0 var(--pixel-notch-half),
+    var(--pixel-notch-half) var(--pixel-notch-half),
+    var(--pixel-notch-half) 0,
+    calc(100% - var(--pixel-notch-half)) 0,
+    calc(100% - var(--pixel-notch-half)) var(--pixel-notch-half),
+    100% var(--pixel-notch-half),
+    100% calc(100% - var(--pixel-notch-half)),
+    calc(100% - var(--pixel-notch-half)) calc(100% - var(--pixel-notch-half)),
+    calc(100% - var(--pixel-notch-half)) 100%,
+    var(--pixel-notch-half) 100%,
+    var(--pixel-notch-half) calc(100% - var(--pixel-notch-half)),
+    0 calc(100% - var(--pixel-notch-half))
   );
 }
 
@@ -115,7 +147,8 @@ a {
   align-items: center;
   justify-content: center;
   min-height: 40px;
-  clip-path: var(--pixel-corners);
+  border: none; /* <button>/<a> 기본 UA 테두리 제거(이제 border는 ::before 레이어로 대체) */
+  clip-path: var(--pixel-corners-btn);
   padding: 0 20px;
   background: var(--ink);
   color: var(--ink);
@@ -128,7 +161,7 @@ a {
   position: absolute;
   inset: var(--pixel-border);
   background: var(--paper);
-  clip-path: var(--pixel-corners);
+  clip-path: var(--pixel-corners-btn);
   z-index: -1;
 }
 

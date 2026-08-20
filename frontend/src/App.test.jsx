@@ -49,4 +49,12 @@ describe('App 라우팅', () => {
     renderAt('/pet');
     expect(screen.getByText('불러오는 중...')).toBeInTheDocument();
   });
+
+  it('/admin/promotions 경로는 관리자가 아니면 프로모션 목록으로 리다이렉트된다', () => {
+    // 로그인하지 않은(user: null) 상태이므로 즉시 /promotions로 리다이렉트되고,
+    // 그 화면은 실제 API를 호출하는 화면이라 로딩 문구가 뜬다(상세 검증은
+    // AdminPromotionsPage.test.jsx가 담당).
+    renderAt('/admin/promotions');
+    expect(screen.getByText('불러오는 중...')).toBeInTheDocument();
+  });
 });

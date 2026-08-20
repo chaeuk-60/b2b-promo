@@ -17,3 +17,11 @@ export function toggleFavorite(promotionId) {
 export function applyPromotion(promotionId) {
   return client.post(`/promotions/${promotionId}/apply`).then((res) => res.data);
 }
+
+export function createPromotion(fields) {
+  return client.post('/promotions', fields).then((res) => res.data);
+}
+
+export function updatePromotion({ promotionId, ...fields }) {
+  return client.put(`/promotions/${promotionId}`, fields).then((res) => res.data);
+}

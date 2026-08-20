@@ -42,47 +42,51 @@ function LoginPage() {
   return (
     <div>
       <h1>b2b-promo</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          이메일
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          비밀번호
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit" disabled={isSubmitting}>
-          {mode === 'login' ? '로그인' : '회원가입'}
-        </button>
-      </form>
-
-      {errorMessage && <p role="alert">{errorMessage}</p>}
-
-      {mode === 'login' ? (
-        <p>
-          아직 계정이 없으신가요?{' '}
-          <button type="button" onClick={() => setMode('signup')}>
-            회원가입
+      <div className="pixel-card">
+        <form onSubmit={handleSubmit}>
+          <label className="pixel-field">
+            <span className="pixel-field-label">이메일</span>
+            <input
+              className="pixel-input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </label>
+          <label className="pixel-field">
+            <span className="pixel-field-label">비밀번호</span>
+            <input
+              className="pixel-input"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+          <button type="submit" className="pixel-btn pixel-btn-primary" disabled={isSubmitting}>
+            {mode === 'login' ? '로그인' : '회원가입'}
           </button>
-        </p>
-      ) : (
-        <p>
-          이미 계정이 있으신가요?{' '}
-          <button type="button" onClick={() => setMode('login')}>
-            로그인
-          </button>
-        </p>
-      )}
+        </form>
+
+        {errorMessage && <p role="alert">{errorMessage}</p>}
+
+        {mode === 'login' ? (
+          <p>
+            아직 계정이 없으신가요?{' '}
+            <button type="button" className="pixel-btn" onClick={() => setMode('signup')}>
+              회원가입
+            </button>
+          </p>
+        ) : (
+          <p>
+            이미 계정이 있으신가요?{' '}
+            <button type="button" className="pixel-btn" onClick={() => setMode('login')}>
+              로그인
+            </button>
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -21,31 +21,38 @@ function PromotionDetailPage() {
   return (
     <div>
       <Link to="/promotions">{'< 목록으로'}</Link>
-      <h2>{promotion.title}</h2>
-      <p>
-        기간: {promotion.start_date} ~ {promotion.end_date}
-      </p>
-      <FavoriteButton promotionId={promotion.id} favorited={promotion.favorited} />
-      <p>{promotion.content}</p>
+      <div className="pixel-card">
+        <h2>{promotion.title}</h2>
+        <p>
+          기간: {promotion.start_date} ~ {promotion.end_date}
+        </p>
+        <FavoriteButton promotionId={promotion.id} favorited={promotion.favorited} />
+        <p>{promotion.content}</p>
 
-      {promotion.applied ? (
-        <>
-          <span>신청 완료</span>
-          <p>취소는 담당자에게 연락 주세요</p>
-        </>
-      ) : ended ? (
-        <>
-          <button type="button" disabled>
-            기간 종료 - 신청불가
+        {promotion.applied ? (
+          <>
+            <span>신청 완료</span>
+            <p>취소는 담당자에게 연락 주세요</p>
+          </>
+        ) : ended ? (
+          <>
+            <button type="button" className="pixel-btn" disabled>
+              기간 종료 - 신청불가
+            </button>
+            <p>담당자에게 연락 주세요</p>
+          </>
+        ) : (
+          <button
+            type="button"
+            className="pixel-btn pixel-btn-primary"
+            onClick={() => applyPromotion.mutate()}
+            disabled={applyPromotion.isPending}
+          >
+            신청하기
           </button>
-          <p>담당자에게 연락 주세요</p>
-        </>
-      ) : (
-        <button type="button" onClick={() => applyPromotion.mutate()} disabled={applyPromotion.isPending}>
-          신청하기
-        </button>
-      )}
-      {applyPromotion.isError && <p role="alert">신청에 실패했습니다.</p>}
+        )}
+        {applyPromotion.isError && <p role="alert">신청에 실패했습니다.</p>}
+      </div>
     </div>
   );
 }

@@ -7,6 +7,7 @@ function FavoriteButton({ promotionId, favorited }) {
   return (
     <button
       type="button"
+      className="pixel-btn pixel-btn-favorite"
       onClick={() => toggleFavorite.mutate(promotionId)}
       disabled={toggleFavorite.isPending}
       aria-pressed={favorited}

@@ -21,7 +21,7 @@ function PromotionCard({ promotion }) {
   const ended = isEnded(promotion.end_date);
 
   return (
-    <div>
+    <div className="pixel-card">
       <h3>
         {foodEmoji(promotion.special_food_id)} {promotion.title}
       </h3>
@@ -35,13 +35,15 @@ function PromotionCard({ promotion }) {
         <span>신청 완료</span>
       ) : ended ? (
         <>
-          <button type="button" disabled>
+          <button type="button" className="pixel-btn" disabled>
             기간 종료 - 신청불가
           </button>
           <p>담당자에게 연락 주세요</p>
         </>
       ) : (
-        <Link to={`/promotions/${promotion.id}`}>신청하기</Link>
+        <Link className="pixel-btn pixel-btn-primary" to={`/promotions/${promotion.id}`}>
+          신청하기
+        </Link>
       )}
     </div>
   );

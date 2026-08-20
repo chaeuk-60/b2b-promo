@@ -28,24 +28,27 @@ function PetNamePage() {
   return (
     <div>
       <h1>펫에게 이름을 지어주세요</h1>
-      <form onSubmit={handleConfirm}>
-        <label>
-          이름
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="이름을 입력하세요"
-          />
-        </label>
-        <button type="button" onClick={handleSkip}>
-          건너뛰기
-        </button>
-        <button type="submit" disabled={nameMutation.isPending}>
-          확인
-        </button>
-      </form>
-      {nameMutation.isError && <p role="alert">이름 저장에 실패했습니다. 다시 시도해주세요.</p>}
+      <div className="pixel-card">
+        <form onSubmit={handleConfirm}>
+          <label className="pixel-field">
+            <span className="pixel-field-label">이름</span>
+            <input
+              className="pixel-input"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="이름을 입력하세요"
+            />
+          </label>
+          <button type="button" className="pixel-btn" onClick={handleSkip}>
+            건너뛰기
+          </button>
+          <button type="submit" className="pixel-btn pixel-btn-primary" disabled={nameMutation.isPending}>
+            확인
+          </button>
+        </form>
+        {nameMutation.isError && <p role="alert">이름 저장에 실패했습니다. 다시 시도해주세요.</p>}
+      </div>
     </div>
   );
 }

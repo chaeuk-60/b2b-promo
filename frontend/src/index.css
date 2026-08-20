@@ -76,7 +76,17 @@
 body {
   margin: 0;
   min-height: 100svh;
-  background: linear-gradient(180deg, var(--bg-sky-top), var(--bg-sky-bottom));
+  /* 부드러운 CSS 그라데이션 대신 색상 띠를 6단으로 딱딱 끊어서 픽셀로 찍은 것처럼
+     보이게 한다(--bg-sky-top ~ --bg-sky-bottom을 6단계로 선형 보간한 색). */
+  background: linear-gradient(
+    180deg,
+    #bfe8f5 0% 16.66%,
+    #c9e2f1 16.66% 33.33%,
+    #d4dced 33.33% 50%,
+    #ded5e8 50% 66.66%,
+    #e9cfe4 66.66% 83.33%,
+    #f3c9e0 83.33% 100%
+  );
   font-family: var(--font-pixel);
   color: var(--ink);
 }
@@ -190,6 +200,17 @@ a {
   background: var(--accent-green);
 }
 
+/* "신청 완료" 표시용: 비활성 버튼이지만 "기간 종료"(회색)와 헷갈리지 않게 브랜드 블루로
+   구분한다(성공/완료 느낌). */
+.pixel-btn-done:disabled {
+  background: var(--brand-blue);
+  color: var(--paper);
+}
+
+.pixel-btn-done:disabled::before {
+  background: var(--brand-blue);
+}
+
 .pixel-btn-favorite {
   font-size: 16px;
   transition: transform 150ms;
@@ -236,4 +257,158 @@ a {
 [role='alert'] {
   color: var(--warn);
   font-weight: bold;
+}
+
+/* 공통 네비게이션(10-plan.md FE-10, 8-wireframe.md 3번): 넓은 화면은 아이콘+글자
+   가로 나열, 좁은 화면은 글자를 숨기고 아이콘만 남긴다(컴포넌트 분기 없이 CSS만). */
+.app-nav {
+  position: relative; /* 팝업 오버레이(z-index: 10)보다 위에 떠 있어야 "펫 보기"를 다시 눌러 닫을 수 있다 */
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.app-nav a {
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.app-nav-pet-toggle {
+  margin-left: auto; /* "펫 보기"는 우측 정렬 */
+}
+
+.app-nav-pet-thumbnail {
+  /* 버튼 자체가 이미 픽셀 노치 테두리를 가지고 있어(.pixel-btn), 스프라이트에 또 테두리를
+     주면 테두리 안에 테두리가 겹쳐 보인다. 이미지는 테두리 없이 버튼 안에만 앉힌다. */
+  vertical-align: middle;
+}
+
+@media (max-width: 480px) {
+  .app-nav-label {
+    display: none;
+  }
+}
+
+/* 펫 팝업(FE-10): 어느 화면에서든 "펫 보기"를 누르면 뜨고, 다시 누르거나 배경을
+   클릭하거나 닫기 버튼을 누르면 닫힌다. */
+.pet-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 26, 46, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  z-index: 10;
+}
+
+.pet-popup {
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden; /* 말풍선이 길 때 pet-wander(절대 위치)가 팝업 밖으로 삐져나가 가로 스크롤이 생기는 것 방지 */
+}
+
+/* 펫이 서 있는 초원 배경(8-wireframe.md 6번 "초원 배경 안에 펫 이미지",
+   docs/mockups/pet-screen-mockup.html의 .meadow를 그대로 이식). */
+.pet-scene {
+  position: relative;
+  min-height: 190px;
+  margin: var(--space-2) 0;
+  border-radius: 12px;
+  background: url('/images/meadow-bg.svg') center / cover no-repeat;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: var(--space-2);
+}
+
+.pet-bubble {
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 4px 10px;
+  margin: 0 0 24px; /* 펫 머리 위로 더 띄운다 */
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+/* 펫 이동/통통 튀기(docs/mockups/pet-screen-mockup.html에서 그대로 이식). 말풍선을
+   .pet-wander 안에 같이 둬서 펫을 따라다니게 하고, 좌우 반전은 말풍선 글자가 뒤집히지
+   않도록 캐릭터 레이어(.pet-hop)에만 건다. */
+.pet-wander {
+  position: absolute;
+  bottom: 16px;
+  left: 17%;
+  animation: pet-wander 14s infinite;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pet-hop {
+  animation: pet-flip 14s linear infinite;
+}
+
+.pet-bounce {
+  animation: pet-bounce 4s steps(1, jump-end) infinite;
+}
+
+@keyframes pet-wander {
+  0% { left: 17%; animation-timing-function: steps(1, jump-end); }
+  7% { left: 25%; animation-timing-function: steps(1, jump-end); }
+  14% { left: 33%; animation-timing-function: steps(1, jump-end); }
+  20% { left: 41%; animation-timing-function: steps(1, jump-end); }
+  27% { left: 49%; animation-timing-function: steps(1, jump-end); }
+  34% { left: 57%; animation-timing-function: steps(1, jump-end); }
+  40% { left: 65%; animation-timing-function: steps(1, jump-end); }
+  70% { left: 65%; animation-timing-function: steps(1, jump-end); }
+  75% { left: 57%; animation-timing-function: steps(1, jump-end); }
+  80% { left: 49%; animation-timing-function: steps(1, jump-end); }
+  85% { left: 41%; animation-timing-function: steps(1, jump-end); }
+  90% { left: 33%; animation-timing-function: steps(1, jump-end); }
+  95% { left: 25%; animation-timing-function: steps(1, jump-end); }
+  100% { left: 17%; }
+}
+
+/* 3번은 작게 통통, 4번째(75~100%)는 크게 포물선으로 점프 - 4초 주기로 반복 */
+@keyframes pet-bounce {
+  0%, 25%, 50%, 75%, 100% { transform: translateY(0); }
+  6.25%, 18.75% { transform: translateY(-4px); }
+  12.5% { transform: translateY(-8px); }
+  31.25%, 43.75% { transform: translateY(-4px); }
+  37.5% { transform: translateY(-8px); }
+  56.25%, 68.75% { transform: translateY(-4px); }
+  62.5% { transform: translateY(-8px); }
+  81.25%, 93.75% { transform: translateY(-10px); }
+  87.5% { transform: translateY(-22px); }
+}
+
+@keyframes pet-flip {
+  0%, 69% { transform: scaleX(1); }
+  70%, 100% { transform: scaleX(-1); }
+}
+
+/* 알 단계는 다리가 없어 돌아다니지 못하고 제자리에서 흔들리는 idle 모션만 가진다
+   (1-domain-definition.md). */
+.pet-egg-idle {
+  animation: pet-egg-idle 2.4s ease-in-out infinite;
+}
+
+@keyframes pet-egg-idle {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pet-wander,
+  .pet-hop,
+  .pet-bounce,
+  .pet-egg-idle {
+    animation: none;
+  }
 }

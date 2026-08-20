@@ -77,7 +77,7 @@ describe('PromotionDetailPage', () => {
     getPromotion.mockResolvedValue({ ...basePromotion, end_date: '2020-01-01' });
     renderDetail();
 
-    const disabledButton = await screen.findByRole('button', { name: '기간 종료 - 신청불가' });
+    const disabledButton = await screen.findByRole('button', { name: '기간 종료' });
     expect(disabledButton).toBeDisabled();
     expect(screen.getByText('담당자에게 연락 주세요')).toBeInTheDocument();
   });

@@ -18,7 +18,8 @@ describe('PetView', () => {
     );
 
     expect(screen.getByText('상태: 배고픔')).toBeInTheDocument();
-    expect(screen.getByText('(꼬르륵... 배고파요)')).toBeInTheDocument();
+    // 대사는 목록 중 랜덤으로 골라 표시하므로(1-domain-definition.md), 후보 중 하나인지만 확인한다.
+    expect(screen.getByText(/꼬르륵\.\.\. 배고파요|밥 주세요!/)).toBeInTheDocument();
     expect(screen.getByAltText('새끼 (배고픔)')).toHaveAttribute('src', '/images/baby-dog.svg');
   });
 

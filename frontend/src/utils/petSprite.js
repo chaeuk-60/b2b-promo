@@ -33,32 +33,41 @@ export const HAPPY_WALK_FRAMES = ['/images/happy-walk-1.svg', '/images/happy-wal
 export const TOMBSTONE_SPRITE_URL = '/images/tombstone.svg';
 export const TOMBSTONE_MESSAGE = '자주 오세요...';
 
-// 일상 대사: 알은 옹알이/의성어 수준, 새끼/성체는 문장 형태(1-domain-definition.md 5장).
-// 정확한 문구 목록이 도메인 문서에 없어 위 규칙에 맞춰 새로 작성한 예시 문구다.
+// 일상 대사: 알은 옹알이/의성어 수준, 새끼/성체는 문장 형태, 각 단계마다 여러 개의 목록을
+// 갖고 그중에서 랜덤으로 골라 출력한다(1-domain-definition.md 5장 "일상 대사"). 정확한
+// 문구 목록이 도메인 문서에 없어 위 규칙에 맞춰 새로 작성한 예시 문구다.
 const EGG_DIALOGUE = {
-  평범: '...',
-  더러움: '(꾸물꾸물)',
-  반질반질: '반짝✨',
-  무지개: '뿌잉~',
-  반짝이: '초롱초롱',
-  '특식 요청': '(꼼지락꼼지락)',
+  평범: ['...', '(콩콩)', '음냐음냐'],
+  더러움: ['(꾸물꾸물)', '(꼬물꼬물)'],
+  반질반질: ['반짝✨', '뽀득뽀득'],
+  무지개: ['뿌잉~', '(두근두근)'],
+  반짝이: ['초롱초롱', '반짝반짝'],
+  '특식 요청': ['(꼼지락꼼지락)', '(꼬르륵)'],
 };
 
 const MOOD_DIALOGUE = {
-  평범: '오늘도 좋은 하루예요',
-  더러움: '몸이 근질근질해요...',
-  배고픔: '꼬르륵... 배고파요',
-  삐짐: '흥, 아무도 안 놀아줘요',
-  행복: '신난다!',
-  무지개: '기분이 완전 좋아요!',
-  반짝이: '반짝반짝 빛나요',
-  '특식 요청': '맛있는 특식이 먹고 싶어요!',
+  평범: ['오늘도 좋은 하루예요', '뭐하고 놀까요?', '(콧노래)'],
+  더러움: ['몸이 근질근질해요...', '씻고 싶어요'],
+  배고픔: ['꼬르륵... 배고파요', '밥 주세요!'],
+  삐짐: ['흥, 아무도 안 놀아줘요', '삐졌어요...'],
+  행복: ['신난다!', '오늘 최고예요!'],
+  무지개: ['기분이 완전 좋아요!', '완전 무지개 기분!'],
+  반짝이: ['반짝반짝 빛나요', '나 좀 반짝이지 않아요?'],
+  '특식 요청': ['맛있는 특식이 먹고 싶어요!', '그 특식... 저 주시면 안 돼요?'],
 };
 
-export function eggDialogue(eggState) {
+function pickRandom(list) {
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+export function eggDialoguePool(eggState) {
   return EGG_DIALOGUE[eggState] || EGG_DIALOGUE['평범'];
 }
 
-export function moodDialogue(mood) {
+export function moodDialoguePool(mood) {
   return MOOD_DIALOGUE[mood] || MOOD_DIALOGUE['평범'];
+}
+
+export function pickDialogue(pool) {
+  return pickRandom(pool);
 }

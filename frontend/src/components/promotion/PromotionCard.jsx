@@ -22,11 +22,13 @@ function PromotionCard({ promotion }) {
       <FavoriteButton promotionId={promotion.id} favorited={promotion.favorited} />
 
       {promotion.applied ? (
-        <span>신청 완료</span>
+        <button type="button" className="pixel-btn pixel-btn-done" disabled>
+          신청 완료
+        </button>
       ) : ended ? (
         <>
           <button type="button" className="pixel-btn" disabled>
-            기간 종료 - 신청불가
+            기간 종료
           </button>
           <p>담당자에게 연락 주세요</p>
         </>

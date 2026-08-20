@@ -19,12 +19,12 @@ vi.mock('../../api/application.api', () => ({
 import { bathePet, feedPet, patPet, feedSpecialFood, fetchFortune } from '../../api/pet.api';
 import { listMyApplications } from '../../api/application.api';
 
-function renderButtons(pet, applications = []) {
+function renderButtons(pet, applications = [], onAction = () => {}) {
   listMyApplications.mockResolvedValue(applications);
   const queryClient = new QueryClient();
   return render(
     <QueryClientProvider client={queryClient}>
-      <PetActionButtons pet={pet} />
+      <PetActionButtons pet={pet} onAction={onAction} />
     </QueryClientProvider>
   );
 }
@@ -87,18 +87,60 @@ describe('PetActionButtons', () => {
     expect(feedSpecialFood.mock.calls[0][0]).toEqual({ promotionId: 1 });
   });
 
-  it('알 단계에서는 오늘의 운세 버튼이 노출되지 않는다', () => {
+  it('알 단계에서는 오늘의 운세 버튼이 비활성화되고 안내 툴팁이 붙는다', () => {
     renderButtons({ stage: '알', egg_state: '평범' });
 
-    expect(screen.queryByRole('button', { name: '오늘의 운세' })).not.toBeInTheDocument();
+    const fortuneButton = screen.getByRole('button', { name: '오늘의 운세' });
+    expect(fortuneButton).toBeDisabled();
+    expect(fortuneButton).toHaveAttribute('title', '알에서 부화하면 이용할 수 있어요');
   });
 
-  it('새끼/성체에서는 오늘의 운세 버튼을 눌러 결과가 표시된다', async () => {
+  it('새끼/성체에서는 오늘의 운세 버튼을 눌러 펫이 말하는 형태로 결과가 전달된다', async () => {
     fetchFortune.mockResolvedValue({ message: '오늘은 좋은 일이 생길 거예요' });
-    renderButtons(adultPet);
+    const onAction = vi.fn();
+    renderButtons(adultPet, [], onAction);
 
-    fireEvent.click(screen.getByRole('button', { name: '오늘의 운세' }));
+    const fortuneButton = screen.getByRole('button', { name: '오늘의 운세' });
+    expect(fortuneButton).not.toBeDisabled();
+    fireEvent.click(fortuneButton);
 
-    expect(await screen.findByText('오늘은 좋은 일이 생길 거예요')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(onAction).toHaveBeenCalledWith({ emoji: '🍀', text: '오늘은 좋은 일이 생길 거예요' })
+    );
+  });
+
+  it('행동 성공 시 각 행동에 맞는 반응(이모지+문구)으로 onAction이 호출된다', async () => {
+    bathePet.mockResolvedValue({});
+    patPet.mockResolvedValue({});
+    const onAction = vi.fn();
+    renderButtons(adultPet, [], onAction);
+
+    fireEvent.click(screen.getByRole('button', { name: '목욕' }));
+    await waitFor(() => expect(onAction).toHaveBeenCalledWith({ emoji: '🫧', text: '뽀송뽀송' }));
+
+    fireEvent.click(screen.getByRole('button', { name: '쓰다듬기' }));
+    await waitFor(() => expect(onAction).toHaveBeenCalledWith({ emoji: '❤️', text: '기분 좋아요~' }));
+  });
+
+  it('특식을 급여하면 해당 특식 이모지+하트로 onAction이 호출된다', async () => {
+    feedSpecialFood.mockResolvedValue({});
+    const onAction = vi.fn();
+    renderButtons(
+      adultPet,
+      [{ promotion_id: 1, title: '여름맞이 쌀 증정', special_food_id: 'rice-cake' }],
+      onAction
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /^밥/ }));
+    const specialButton = await screen.findByRole('button', { name: /특식 주기/ });
+    await waitFor(() => expect(specialButton).not.toBeDisabled());
+    fireEvent.click(specialButton);
+    fireEvent.click(await screen.findByRole('radio'));
+    fireEvent.click(screen.getByRole('button', { name: '급여하기' }));
+
+    await waitFor(() => expect(onAction).toHaveBeenCalled());
+    const reaction = onAction.mock.calls[0][0];
+    expect(reaction.emoji).toContain('❤️');
+    expect(reaction.text).toBe('완전 최고예요!!! 냠냠냠!!');
   });
 });

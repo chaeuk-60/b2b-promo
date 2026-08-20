@@ -66,7 +66,7 @@ describe('PromotionCard', () => {
   it('기간이 종료된 프로모션은 신청 버튼이 비활성화되고 안내 문구가 표시된다', () => {
     renderCard({ ...basePromotion, end_date: '2020-01-01' });
 
-    const applyButton = screen.getByRole('button', { name: '기간 종료 - 신청불가' });
+    const applyButton = screen.getByRole('button', { name: '기간 종료' });
     expect(applyButton).toBeDisabled();
     expect(screen.getByText('담당자에게 연락 주세요')).toBeInTheDocument();
   });

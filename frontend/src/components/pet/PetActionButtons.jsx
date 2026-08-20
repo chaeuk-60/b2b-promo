@@ -9,11 +9,22 @@ import { useBathePet, useFeedPet, useFeedSpecialFood, usePatPet, useFortune } fr
 import { useMyApplications } from '../../hooks/useMyApplications';
 import { foodEmoji } from '../../utils/foodEmoji';
 
-function PetActionButtons({ pet }) {
+// 행동별 반응(말풍선에 잠깐 표시, PetPanel이 실제 타이머를 관리한다). 텍스트는 알
+// 단계에서는 안 쓰고 이모지만 보여준다(PetView가 stage로 판단).
+const REACTIONS = {
+  bathe: { emoji: '🫧', text: '뽀송뽀송' },
+  feed: { emoji: '🍚', text: '냠~' },
+  pat: { emoji: '❤️', text: '기분 좋아요~' },
+};
+
+function PetActionButtons({ pet, onAction }) {
+  function notify(action) {
+    onAction?.(REACTIONS[action]);
+  }
+
   const [showFeedMenu, setShowFeedMenu] = useState(false);
   const [showFoodPicker, setShowFoodPicker] = useState(false);
   const [selectedPromotionId, setSelectedPromotionId] = useState(null);
-  const [fortuneMessage, setFortuneMessage] = useState(null);
 
   const { data: applications } = useMyApplications();
   const heldFoods = applications || [];
@@ -28,7 +39,12 @@ function PetActionButtons({ pet }) {
   const canShowFortune = pet.stage === '새끼' || pet.stage === '성체';
 
   function handleFeedBasic() {
-    feed.mutate(undefined, { onSuccess: () => setShowFeedMenu(false) });
+    feed.mutate(undefined, {
+      onSuccess: () => {
+        setShowFeedMenu(false);
+        notify('feed');
+      },
+    });
   }
 
   function openFoodPicker() {
@@ -37,24 +53,37 @@ function PetActionButtons({ pet }) {
 
   function handleFeedSpecial() {
     if (!selectedPromotionId) return;
+    const selected = heldFoods.find((a) => a.promotion_id === selectedPromotionId);
     feedSpecial.mutate(
       { promotionId: selectedPromotionId },
       {
         onSuccess: () => {
           setShowFoodPicker(false);
           setShowFeedMenu(false);
+          onAction?.({
+            emoji: `${foodEmoji(selected?.special_food_id)}❤️`,
+            text: '완전 최고예요!!! 냠냠냠!!',
+          });
         },
       }
     );
   }
 
   function handleFortune() {
-    fortune.mutate(undefined, { onSuccess: (data) => setFortuneMessage(data.message) });
+    fortune.mutate(undefined, {
+      // 오늘의 운세는 별도 문구가 아니라 펫이 직접 말풍선으로 말해준다.
+      onSuccess: (data) => onAction?.({ emoji: '🍀', text: data.message }),
+    });
   }
 
   return (
     <div>
-      <button type="button" className="pixel-btn" onClick={() => bathe.mutate()} disabled={anyPending}>
+      <button
+        type="button"
+        className="pixel-btn"
+        onClick={() => bathe.mutate(undefined, { onSuccess: () => notify('bathe') })}
+        disabled={anyPending}
+      >
         목욕
       </button>
       <button
@@ -65,25 +94,28 @@ function PetActionButtons({ pet }) {
       >
         밥 {showFeedMenu ? '▲' : '▼'}
       </button>
-      <button type="button" className="pixel-btn" onClick={() => pat.mutate()} disabled={anyPending}>
+      <button
+        type="button"
+        className="pixel-btn"
+        onClick={() => pat.mutate(undefined, { onSuccess: () => notify('pat') })}
+        disabled={anyPending}
+      >
         쓰다듬기
       </button>
 
-      {canShowFortune && (
-        <button
-          type="button"
-          className="pixel-btn pixel-btn-primary"
-          onClick={handleFortune}
-          disabled={fortune.isPending}
-        >
-          오늘의 운세
-        </button>
-      )}
+      <button
+        type="button"
+        className="pixel-btn pixel-btn-primary"
+        onClick={handleFortune}
+        disabled={!canShowFortune || fortune.isPending}
+        title={canShowFortune ? undefined : '알에서 부화하면 이용할 수 있어요'}
+      >
+        오늘의 운세
+      </button>
 
       {(bathe.isError || feed.isError || pat.isError || fortune.isError) && (
         <p role="alert">행동 처리에 실패했습니다.</p>
       )}
-      {fortuneMessage && <p>{fortuneMessage}</p>}
 
       {showFeedMenu && !showFoodPicker && (
         <div className="pixel-card">

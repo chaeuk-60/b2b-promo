@@ -125,8 +125,8 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - `frontend/src/api/client.js`: axios 인스턴스 + 인터셉터(액세스 토큰 자동 첨부, 401 시 리프레시 토큰으로 재발급 후 재시도).
 - 선행: 없음
 - 완료 조건:
-  - [ ] `npm run dev`로 앱이 기동되고 빈 페이지 라우트 5개(로그인/목록/상세/나의신청/펫)로 이동이 가능하다.
-  - [ ] `client.js`가 액세스 토큰을 자동으로 Authorization 헤더에 붙이고, 401 응답 시 리프레시를 시도한다.
+  - [x] `npm run dev`로 앱이 기동되고 빈 페이지 라우트 5개(로그인/목록/상세/나의신청/펫)로 이동이 가능하다.
+  - [x] `client.js`가 액세스 토큰을 자동으로 Authorization 헤더에 붙이고, 401 응답 시 리프레시를 시도한다.
 
 ### FE-2. 인증 화면 및 상태
 - `frontend/src/api/auth.api.js`, `frontend/src/hooks/useAuth.js`(TanStack Query), `frontend/src/store/auth.store.js`(Zustand, 로그인 사용자 정보만).

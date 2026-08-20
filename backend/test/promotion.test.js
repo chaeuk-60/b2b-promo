@@ -381,7 +381,15 @@ test('신청 완료한 프로모션이 GET /applications(나의 신청 목록)�
 
   assert.equal(myApplications.status, 200);
   assert.ok(Array.isArray(myApplications.body));
-  assert.ok(myApplications.body.some((a) => a.promotion_id === promotionId));
+  const found = myApplications.body.find((a) => a.promotion_id === promotionId);
+  assert.ok(found, '방금 신청한 프로모션이 목록에 있어야 한다');
+  // 나의 신청 목록 화면(8-wireframe.md 5번)이 제목/기간 카드를 그릴 수 있어야 하므로
+  // applications 원본 필드뿐 아니라 promotions 조인 필드도 함께 내려와야 한다.
+  assert.equal(found.title, '나의 신청 목록 테스트 프로모션');
+  assert.equal(found.start_date, '2026-08-01');
+  assert.equal(found.end_date, '2026-12-31');
+  assert.equal(found.special_food_id, 'test-food');
+  assert.ok(found.applied_at);
 });
 
 test('존재하지 않는 promotionId로 상세 조회/신청/찜 호출 시 404가 반환된다', async (t) => {

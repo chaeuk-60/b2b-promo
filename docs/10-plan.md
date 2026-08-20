@@ -166,8 +166,8 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - `frontend/src/pages/MyApplicationsPage.jsx`: 신청한 프로모션 카드 목록(제목/신청일/기간), 취소 버튼 없이 안내 문구만 표시(`8-wireframe.md` 5번).
 - 선행: FE-4
 - 완료 조건:
-  - [ ] 로그인한 사용자가 신청한 프로모션만 목록에 표시된다.
-  - [ ] 취소 버튼은 없고 "취소는 담당자에게 연락 주세요" 문구가 표시된다.
+  - [x] 로그인한 사용자가 신청한 프로모션만 목록에 표시된다.
+  - [x] 취소 버튼은 없고 "취소는 담당자에게 연락 주세요" 문구가 표시된다.
 
 ### FE-7. 펫 화면 - 상태 표시
 - `frontend/src/api/pet.api.js`, `frontend/src/hooks/usePet.js`(펫 조회 useQuery).

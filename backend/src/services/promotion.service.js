@@ -128,9 +128,16 @@ async function toggleFavorite(userId, promotionId) {
   return { favorited: true };
 }
 
+// 나의 신청 목록 화면(8-wireframe.md 5번)은 제목/신청일/기간을 카드로 보여줘야 해서
+// applications 원본 행만으로는 부족하다 - promotions를 조인해 필요한 필드를 함께 내려준다.
 async function listMyApplications(userId) {
   const { rows } = await pool.query(
-    'SELECT * FROM applications WHERE user_id = $1 ORDER BY applied_at DESC',
+    `SELECT a.id, a.promotion_id, a.applied_at,
+            p.title, p.start_date, p.end_date, p.special_food_id
+       FROM applications a
+       JOIN promotions p ON p.id = a.promotion_id
+      WHERE a.user_id = $1
+      ORDER BY a.applied_at DESC`,
     [userId]
   );
   return rows;

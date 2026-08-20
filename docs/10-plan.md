@@ -13,10 +13,11 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - `9-schema.sql`(users, refresh_tokens, promotions, applications, favorites, pets)을 `backend/src/db/migrations/001_init.sql`로 그대로 옮겨 배치한다.
 - `9-schema.sql` 내용을 변경하지 않는다(제약조건으로 이미 1:1, 중복신청 방지, 찜 복합키가 해결되어 있으므로 앱 코드 검증을 추가하지 않는다).
 - 로컬 PostgreSQL 17에 실제로 적용해 테이블 6개가 생성되는지 확인한다.
+- BE 작업 중 뒤늦게 필요해진 컬럼(daily_login_count, fortune_message, fortune_date)과 FK 제약 조정(requested_promotion_id ON DELETE SET NULL)은 `9-schema.sql`에도 반영하고, `002_pet_daily_login_count.sql`/`003_pets_requested_promotion_fk_set_null.sql`/`004_pet_fortune.sql` 후속 마이그레이션으로 나눠 적용한다(001_init.sql은 최초 버전으로 유지, 되돌리지 않는다).
 - 선행: 없음
 - 완료 조건:
-  - [x] `backend/src/db/migrations/001_init.sql` 파일이 `9-schema.sql`과 동일한 내용으로 생성되어 있다.
-  - [x] 로컬 DB에 마이그레이션을 실행해 `users/refresh_tokens/promotions/applications/favorites/pets` 6개 테이블이 정상 생성된다.
+  - [x] `backend/src/db/migrations/001_init.sql` 파일이 최초 버전 `9-schema.sql`과 동일한 내용으로 생성되어 있고, 이후 스키마 변경은 002~004 후속 마이그레이션으로 관리된다.
+  - [x] 로컬 DB에 마이그레이션(001~004)을 순서대로 실행해 `users/refresh_tokens/promotions/applications/favorites/pets` 6개 테이블이 `9-schema.sql`(최신 버전) 그대로 생성된다.
 
 ### DB-2. pg 연결 풀 모듈 및 환경변수 정의
 - `backend/src/db/pool.js`에 `pg.Pool`을 생성하고 export하는 모듈을 작성한다(`DATABASE_URL` 환경변수 사용).
@@ -177,11 +178,11 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
   - [ ] 묘비 상태일 때 "자주 오세요..." 메시지가 표시된다.
 
 ### FE-8. 펫 화면 - 행동 버튼
-- `frontend/src/hooks/usePetAction.js`(목욕/밥/특식주기/쓰다듬기/운세 useMutation), `frontend/src/components/pet/PetActionButtons.jsx`: 목욕/밥/쓰다듬기 3버튼 + "밥" 클릭 시 기본주식/특식주기 하위 메뉴 + 특식주기 시 보유 특식 목록에서 선택 + 오늘의 운세 버튼(새끼/성체 전용, `8-wireframe.md` "밥"/"특식 주기" 하위 화면).
+- `frontend/src/hooks/usePetAction.js`(목욕/밥/특식주기/쓰다듬기/운세 useMutation), `frontend/src/components/pet/PetActionButtons.jsx`: 목욕/밥/특식 주기/쓰다듬기 4버튼이 동등하게 노출(밥은 특식 주기의 하위 메뉴가 아니라 완전히 분리된 버튼, `1-domain-definition.md` "특식 주기 버튼" 규칙) + 특식 주기 클릭 시 보유 특식 목록에서 선택 + 오늘의 운세 버튼(새끼/성체 전용, `8-wireframe.md` 6번).
 - 선행: BE-6, BE-8, FE-7
 - 완료 조건:
   - [ ] 목욕/밥/쓰다듬기 버튼 클릭 시 펫 상태가 갱신되어 화면에 반영된다.
-  - [ ] 보유 특식이 없으면 "특식 주기"가 비활성화되고, 있으면 목록에서 선택해 급여할 수 있다.
+  - [ ] 보유 특식이 없으면 "특식 주기" 버튼이 비활성화되고, 있으면 목록에서 선택해 급여할 수 있다.
   - [ ] 오늘의 운세 버튼은 알 단계에서 비활성/미노출이고, 새끼/성체에서만 결과가 표시된다.
 
 ### FE-9. 관리자 프로모션 등록/수정 화면

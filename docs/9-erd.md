@@ -55,6 +55,7 @@ erDiagram
         string eggState "알 전용"
         ID requestedPromotionId "특식 요청 대상"
         int activityCount
+        int dailyLoginCount "오늘 몇 번째 접속인지(mood 재계산용)"
         datetime lastActiveAt
         datetime lastGiftAt
         datetime stageChangedAt

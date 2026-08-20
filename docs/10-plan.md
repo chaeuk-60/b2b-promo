@@ -63,8 +63,8 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - 프로모션 등록/수정 라우트에서만 이 판별을 사용하는 간단한 미들웨어(`requireAdmin`)로 구현한다.
 - 선행: BE-2
 - 완료 조건:
-  - [ ] 관리자 이메일로 로그인한 사용자만 `requireAdmin`을 통과한다.
-  - [ ] 관리자가 아닌 사용자가 등록/수정 API를 호출하면 403이 반환된다.
+  - [x] 관리자 이메일로 로그인한 사용자만 `requireAdmin`을 통과한다.
+  - [x] 관리자가 아닌 사용자가 등록/수정 API를 호출하면 403이 반환된다(BE-4에서 실제 프로모션 등록/수정 라우트에 `requireAdmin`을 적용하기 전까지는, `auth.middleware`+`requireAdmin`을 붙인 테스트 전용 라우트로 검증함).
 
 ### BE-4. 프로모션 도메인 (목록/상세/등록·수정/신청/찜)
 - `backend/src/services/promotion.service.js`: 목록/상세 조회, 등록/수정(관리자, title/기간/content/specialFoodId), 신청(기간 내 검증, 중복 신청은 DB UNIQUE로 처리 후 에러 매핑), 찜 토글.

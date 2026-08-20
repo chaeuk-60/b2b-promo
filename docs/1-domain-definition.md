@@ -71,6 +71,7 @@
 | eggState | enum(평범, 더러움, 반질반질, 무지개, 반짝이, 특식 요청) | N | 알 단계 전용 상태. mood와 별개. 기본값 평범 |
 | requestedPromotionId | ID | N | mood 또는 eggState가 "특식 요청"일 때 요청 중인 프로모션(그날 고정) |
 | activityCount | int | Y | 알 단계부터 누적된 행동 횟수(성장 판정용). 새 알로 시작할 때(성체 순환 또는 사망) 초기화 |
+| dailyLoginCount | int | Y | 오늘 몇 번째 접속인지(mood/eggState 로그인별 재계산 규칙에 사용). lastActiveAt 날짜(자정/KST 기준)가 바뀌면 1로 리셋, 같은 날 재로그인 시 +1 |
 | lastActiveAt | datetime | Y | 로그인 시 갱신. 방치 사망 판정 기준 |
 | lastGiftAt | datetime | N | 마지막으로 선물(쿠폰)을 받은 시각. 3일 쿨다운 판정에 사용 |
 | stageChangedAt | datetime | Y | 현재 단계로 전이된 시각. 성체 순환(2주) 판정에 사용 |

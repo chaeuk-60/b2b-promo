@@ -105,6 +105,7 @@
           },
           "requested_promotion_id": { "type": "integer", "format": "int64", "nullable": true },
           "activity_count": { "type": "integer" },
+          "daily_login_count": { "type": "integer" },
           "last_active_at": { "type": "string", "format": "date-time" },
           "last_gift_at": { "type": "string", "format": "date-time", "nullable": true },
           "stage_changed_at": { "type": "string", "format": "date-time" },

@@ -25,4 +25,41 @@ async function nameMyPet(req, res, next) {
   }
 }
 
-module.exports = { getMyPet, nameMyPet };
+async function bathe(req, res, next) {
+  try {
+    const pet = await petService.applyAction(req.user.id, 'bathe');
+    res.status(200).json(pet);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function feed(req, res, next) {
+  try {
+    const pet = await petService.applyAction(req.user.id, 'feed');
+    res.status(200).json(pet);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function pat(req, res, next) {
+  try {
+    const pet = await petService.applyAction(req.user.id, 'pat');
+    res.status(200).json(pet);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function feedSpecialFood(req, res, next) {
+  try {
+    const { promotionId } = req.body;
+    const pet = await petService.feedSpecialFood(req.user.id, promotionId);
+    res.status(200).json(pet);
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getMyPet, nameMyPet, bathe, feed, feedSpecialFood, pat };

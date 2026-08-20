@@ -132,4 +132,118 @@ async function resolveMoodOnLogin(userId) {
   return result.rows[0];
 }
 
-module.exports = { getPet, nameOwnPet, resolveMoodOnLogin };
+// 성장 전이 시도(알→새끼, 새끼→성체): activityCount 임계치 충족 시 50% 확률 판정.
+// 실패/미충족이면 UPDATE 없이 pet 그대로 반환.
+async function checkStageTransition(pet, random) {
+  if (pet.stage === '알' && pet.activity_count >= 2) {
+    if (random() < 0.5) {
+      const result = await pool.query(
+        `UPDATE pets
+            SET stage = '새끼', egg_state = NULL, mood = '평범', stage_changed_at = now()
+          WHERE user_id = $1
+          RETURNING *`,
+        [pet.user_id]
+      );
+      return result.rows[0];
+    }
+    return pet;
+  }
+  if (pet.stage === '새끼' && pet.activity_count >= 5) {
+    if (random() < 0.5) {
+      const result = await pool.query(
+        `UPDATE pets
+            SET stage = '성체', stage_changed_at = now()
+          WHERE user_id = $1
+          RETURNING *`,
+        [pet.user_id]
+      );
+      return result.rows[0];
+    }
+    return pet;
+  }
+  return pet;
+}
+
+// 목욕/밥/쓰다듬기 공통 처리: 도메인 정의서 5.1절 단계별 행동표 그대로.
+async function applyAction(userId, action, { random = Math.random } = {}) {
+  let pet = await getPet(userId);
+  if (!pet || pet.stage === '묘비') return pet;
+
+  let mood = pet.mood;
+  let eggState = pet.egg_state;
+
+  if (pet.stage === '알') {
+    if (action === 'bathe') eggState = '반질반질';
+    // feed/pat: eggState 변경 없음
+  } else {
+    if (action === 'bathe' && mood === '더러움') mood = '평범';
+    if (action === 'feed' && mood === '배고픔') mood = '평범';
+    if (action === 'pat' && mood === '삐짐') mood = '평범';
+  }
+
+  const result = await pool.query(
+    `UPDATE pets
+        SET mood = $1, egg_state = $2, activity_count = activity_count + 1
+      WHERE user_id = $3
+      RETURNING *`,
+    [mood, eggState, userId]
+  );
+  pet = result.rows[0];
+
+  return checkStageTransition(pet, random);
+}
+
+// 특식 급여: 요청받은 특식과 일치하면 무지개, 그 외(자발적 급여)는 50% 진화 시도/50% 반짝이.
+async function feedSpecialFood(userId, promotionId, { random = Math.random } = {}) {
+  let pet = await getPet(userId);
+  if (!pet || pet.stage === '묘비') return pet;
+
+  const owned = await pool.query(
+    'SELECT 1 FROM applications WHERE user_id = $1 AND promotion_id = $2',
+    [userId, promotionId]
+  );
+  if (owned.rows.length === 0) {
+    throw Object.assign(new Error('보유하지 않은 특식입니다.'), {
+      status: 400,
+      code: 'SPECIAL_FOOD_NOT_OWNED',
+    });
+  }
+
+  const field = pet.stage === '알' ? 'egg_state' : 'mood';
+  // pg는 BIGINT(requested_promotion_id)를 문자열로 반환하는데 promotionId는 JSON에서 숫자로 오므로,
+  // 문자열로 정규화해서 비교해야 한다(그냥 === 비교하면 타입이 달라 항상 false가 된다).
+  const isRequested =
+    pet[field] === '특식 요청' &&
+    pet.requested_promotion_id != null &&
+    String(pet.requested_promotion_id) === String(promotionId);
+
+  if (isRequested) {
+    const result = await pool.query(
+      `UPDATE pets
+          SET ${field} = '무지개', requested_promotion_id = NULL, activity_count = activity_count + 1
+        WHERE user_id = $1
+        RETURNING *`,
+      [userId]
+    );
+    return result.rows[0];
+  }
+
+  // 자발적 급여: activityCount 증가 후 50/50으로 진화 시도 또는 반짝이 부여
+  const incremented = await pool.query(
+    `UPDATE pets SET activity_count = activity_count + 1 WHERE user_id = $1 RETURNING *`,
+    [userId]
+  );
+  pet = incremented.rows[0];
+
+  if (random() < 0.5) {
+    return checkStageTransition(pet, random);
+  }
+
+  const result = await pool.query(
+    `UPDATE pets SET ${field} = '반짝이' WHERE user_id = $1 RETURNING *`,
+    [userId]
+  );
+  return result.rows[0];
+}
+
+module.exports = { getPet, nameOwnPet, resolveMoodOnLogin, applyAction, feedSpecialFood };

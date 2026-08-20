@@ -7,5 +7,9 @@ const router = express.Router();
 
 router.get('/', authMiddleware, petController.getMyPet);
 router.patch('/name', authMiddleware, petController.nameMyPet);
+router.post('/bathe', authMiddleware, petController.bathe);
+router.post('/feed', authMiddleware, petController.feed);
+router.post('/feed-special-food', authMiddleware, petController.feedSpecialFood);
+router.post('/pat', authMiddleware, petController.pat);
 
 module.exports = router;

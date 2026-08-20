@@ -112,7 +112,9 @@
           "ear_type": {
             "type": "string",
             "enum": ["위로 곧게", "앞으로 접힘", "옆으로 처짐", "뒤로 말림", "아래로 늘어짐"]
-          }
+          },
+          "fortune_message": { "type": "string", "nullable": true },
+          "fortune_date": { "type": "string", "nullable": true, "description": "운세를 뽑은 날짜(KST 'YYYY-MM-DD')" }
         }
       }
     },
@@ -204,7 +206,8 @@
                   "type": "object",
                   "properties": {
                     "accessToken": { "type": "string" },
-                    "user": { "$ref": "#/components/schemas/User" }
+                    "user": { "$ref": "#/components/schemas/User" },
+                    "pet": { "$ref": "#/components/schemas/Pet" }
                   }
                 }
               }
@@ -431,7 +434,14 @@
         "responses": {
           "200": {
             "description": "조회 성공",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "pet": { "$ref": "#/components/schemas/Pet" } }
+                }
+              }
+            }
           },
           "401": { "$ref": "#/components/responses/Unauthorized" }
         }
@@ -459,7 +469,14 @@
         "responses": {
           "200": {
             "description": "설정 성공",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Pet" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "pet": { "$ref": "#/components/schemas/Pet" } }
+                }
+              }
+            }
           },
           "401": { "$ref": "#/components/responses/Unauthorized" }
         }

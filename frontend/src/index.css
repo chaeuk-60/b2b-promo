@@ -312,11 +312,29 @@ a {
   overflow-x: hidden; /* 말풍선이 길 때 pet-wander(절대 위치)가 팝업 밖으로 삐져나가 가로 스크롤이 생기는 것 방지 */
 }
 
+/* 닫기(X) 버튼: 이름 표시줄과 같은 높이의 우상단에 정사각형으로 둔다. */
+.pet-popup-close {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  min-height: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.pet-name-status {
+  text-align: center;
+  font-weight: bold;
+}
+
 /* 펫이 서 있는 초원 배경(8-wireframe.md 6번 "초원 배경 안에 펫 이미지",
    docs/mockups/pet-screen-mockup.html의 .meadow를 그대로 이식). */
 .pet-scene {
   position: relative;
-  min-height: 190px;
+  min-height: 230px;
   margin: var(--space-2) 0;
   border-radius: 12px;
   background: url('/images/meadow-bg.svg') center / cover no-repeat;
@@ -330,11 +348,17 @@ a {
 /* 펫 위치와 무관하게 씬 상단 가운데에 고정한다 - 펫을 따라다니게 했더니 문구가 길 때
    씬 밖으로 삐져나가는 문제가 있어 분리했고, 길면 잘리지 않고 줄바꿈되게 한다. */
 .pet-bubble {
+  /* pet-wander(펫) 바로 위에 붙어서 따라다닌다. absolute로 빼서 pet-wander의
+     shrink-to-fit 너비 계산에 말풍선 길이가 끼어들지 않게 한다(안 그러면 말풍선이
+     길어질 때마다 pet-wander 박스 자체가 넓어져 펫의 left% 위치가 흔들린다 -
+     docs/mockups/pet-screen-mockup.html과 동일한 방식). */
   position: absolute;
-  top: 8px;
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
-  max-width: calc(100% - 24px);
+  margin-bottom: 32px; /* 포물선 점프 최고점(-22px)에 닿지 않도록 여유를 둔다 */
+  width: max-content;
+  max-width: 200px;
   background: var(--paper);
   border: 2px solid var(--ink);
   border-radius: 8px;
@@ -342,13 +366,18 @@ a {
   font-size: 13px;
   white-space: normal;
   text-align: center;
-  z-index: 1;
+}
+
+/* 운세처럼 문장이 길 때는 좁게 여러 줄로 감싸면 씬 높이를 넘어가 배경 밖으로 삐져나간다.
+   가로로 더 늘려서 줄 수를 줄인다. */
+.pet-bubble-wide {
+  max-width: 320px;
 }
 
 /* 펫 이동/통통 튀기(docs/mockups/pet-screen-mockup.html에서 그대로 이식). */
 .pet-wander {
   position: absolute;
-  bottom: 16px;
+  bottom: 40px;
   left: 17%;
   animation: pet-wander 14s infinite;
   display: flex;
@@ -440,6 +469,7 @@ a {
 /* 알 단계는 다리가 없어 돌아다니지 못하고 제자리에서 흔들리는 idle 모션만 가진다
    (1-domain-definition.md). */
 .pet-egg-idle {
+  position: relative; /* 말풍선(.pet-bubble)이 알 스프라이트 기준으로 정확히 뜨도록 */
   animation: pet-egg-idle 2.4s ease-in-out infinite;
 }
 
@@ -455,4 +485,36 @@ a {
   .pet-egg-idle {
     animation: none;
   }
+}
+
+/* 행동 버튼 줄: 좁아지면 줄바꿈하고, 줄바꿈해도 세로 간격이 붙지 않게 gap으로 처리한다. */
+.pet-actions-row {
+  position: relative; /* 밥 메뉴가 이 줄 기준으로 위쪽(씬 아래쪽)에 겹쳐서 뜬다 */
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.pet-actions-row .pixel-btn + .pixel-btn {
+  margin-left: 0; /* gap이 간격을 담당하므로 중복 마진 제거 */
+}
+
+/* 포켓몬 메뉴처럼 씬(초원 배경) 아래쪽에 겹쳐서 뜨는 밥 선택지. 버튼 줄 위로 팝업되므로
+   팝업 세로 스크롤을 늘리지 않는다(중첩 pixel-card + 스크롤 조합에서 노치 렌더링이 깨지는
+   문제가 있어 카드 대신 단순한 테두리 박스로 구성). */
+.pet-feed-menu {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: var(--space-2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  background: var(--paper);
+  border: var(--pixel-border) solid var(--ink);
+  border-radius: 4px;
+  z-index: 5;
 }

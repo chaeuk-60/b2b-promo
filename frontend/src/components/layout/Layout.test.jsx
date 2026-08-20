@@ -61,32 +61,32 @@ describe('Layout', () => {
     renderLayout();
 
     const toggle = screen.getByRole('button', { name: /펫 보기/ });
-    expect(screen.queryByText('이름: 김커푸')).not.toBeInTheDocument();
+    expect(screen.queryByText('김커푸(평범)')).not.toBeInTheDocument();
 
     fireEvent.click(toggle);
-    expect(await screen.findByText('이름: 김커푸')).toBeInTheDocument();
+    expect(await screen.findByText('김커푸(평범)')).toBeInTheDocument();
 
     fireEvent.click(toggle);
-    expect(screen.queryByText('이름: 김커푸')).not.toBeInTheDocument();
+    expect(screen.queryByText('김커푸(평범)')).not.toBeInTheDocument();
   });
 
   it('배경(오버레이)을 클릭하면 팝업이 닫힌다', async () => {
     renderLayout();
 
     fireEvent.click(screen.getByRole('button', { name: /펫 보기/ }));
-    await screen.findByText('이름: 김커푸');
+    await screen.findByText('김커푸(평범)');
 
     fireEvent.click(document.querySelector('.pet-popup-overlay'));
-    expect(screen.queryByText('이름: 김커푸')).not.toBeInTheDocument();
+    expect(screen.queryByText('김커푸(평범)')).not.toBeInTheDocument();
   });
 
   it('닫기 버튼을 누르면 팝업이 닫힌다', async () => {
     renderLayout();
 
     fireEvent.click(screen.getByRole('button', { name: /펫 보기/ }));
-    await screen.findByText('이름: 김커푸');
+    await screen.findByText('김커푸(평범)');
 
     fireEvent.click(screen.getByRole('button', { name: '닫기' }));
-    expect(screen.queryByText('이름: 김커푸')).not.toBeInTheDocument();
+    expect(screen.queryByText('김커푸(평범)')).not.toBeInTheDocument();
   });
 });

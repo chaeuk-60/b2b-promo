@@ -7,8 +7,7 @@ describe('PetView', () => {
   it('알 단계는 eggState에 맞는 스프라이트와 이름/상태를 표시한다', () => {
     render(<PetView pet={{ stage: '알', egg_state: '더러움', name: '김커푸' }} />);
 
-    expect(screen.getByText('이름: 김커푸')).toBeInTheDocument();
-    expect(screen.getByText('상태: 더러움')).toBeInTheDocument();
+    expect(screen.getByText('김커푸(더러움)')).toBeInTheDocument();
     expect(screen.getByAltText('알 (더러움)')).toHaveAttribute('src', '/images/egg-더러움.svg');
   });
 
@@ -17,7 +16,7 @@ describe('PetView', () => {
       <PetView pet={{ stage: '새끼', mood: '배고픔', ear_type: '아래로 늘어짐', name: '김커푸' }} />
     );
 
-    expect(screen.getByText('상태: 배고픔')).toBeInTheDocument();
+    expect(screen.getByText('김커푸(배고픔 Mood)')).toBeInTheDocument();
     // 대사는 목록 중 랜덤으로 골라 표시하므로(1-domain-definition.md), 후보 중 하나인지만 확인한다.
     // 새끼는 아기 말투 목록에서 고른다(petSprite.js BABY_MOOD_DIALOGUE).
     expect(screen.getByText(/배고파따|맘마 조/)).toBeInTheDocument();

@@ -59,8 +59,13 @@ function Layout({ children }) {
       {showPetPopup && (
         <div className="pet-popup-overlay" onClick={() => setShowPetPopup(false)}>
           <div className="pet-popup pixel-card" onClick={(e) => e.stopPropagation()}>
-            <button type="button" className="pixel-btn" onClick={() => setShowPetPopup(false)}>
-              닫기
+            <button
+              type="button"
+              className="pixel-btn pet-popup-close"
+              aria-label="닫기"
+              onClick={() => setShowPetPopup(false)}
+            >
+              ×
             </button>
             <PetPanel />
           </div>

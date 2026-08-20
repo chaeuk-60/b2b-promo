@@ -57,9 +57,9 @@ function useAmbientLine(pool, paused) {
   return line;
 }
 
-function Bubble({ text }) {
+function Bubble({ text, wide }) {
   if (!text) return null;
-  return <p className="pet-bubble">{text}</p>;
+  return <p className={`pet-bubble${wide ? ' pet-bubble-wide' : ''}`}>{text}</p>;
 }
 
 function PetView({ pet, reaction }) {
@@ -89,8 +89,9 @@ function PetView({ pet, reaction }) {
     const bubbleText = reaction ? reaction.emoji : ambientEgg;
     return (
       <div>
-        <p>이름: {pet.name}</p>
-        <p>상태: {pet.egg_state}</p>
+        <p className="pet-name-status">
+          {pet.name}({pet.egg_state})
+        </p>
         <div className="pet-scene">
           {/* 다리가 없어 좌우로 돌아다니지 못하고 제자리에서 흔들리는 idle 모션만 가진다.
               말풍선을 펫과 같이 묶어서 펫이 말하는 것처럼 보이게 한다(길면 줄바꿈). */}
@@ -116,14 +117,14 @@ function PetView({ pet, reaction }) {
 
   return (
     <div>
-      <p>이름: {pet.name}</p>
-      <p>상태: {pet.mood}</p>
+      <p className="pet-name-status">
+        {pet.name}({pet.mood} Mood)
+      </p>
       <div className={`pet-scene${isSpotlight ? ' pet-scene-spotlight' : ''}`}>
-        {/* 말풍선은 펫 위치와 무관하게 씬 상단 가운데 고정(길어지면 줄바꿈) - 펫을 따라
-            움직이게 했더니 문구가 길 때 씬 밖으로 삐져나가는 문제가 있어 분리했다.
-            운세(spotlight)일 때는 펫도 가운데로 멈춰 세운다. */}
-        <Bubble text={bubbleText} />
+        {/* 말풍선을 pet-wander 안에 같이 둬서 펫을 따라다니게 한다(길면 줄바꿈해서 씬
+            밖으로 삐져나가지 않게 함). 운세(spotlight)일 때는 펫도 가운데로 멈춰 세운다. */}
         <div className={`pet-wander${isSpotlight ? ' pet-wander-paused' : ''}`}>
+          <Bubble text={bubbleText} wide={isSpotlight} />
           <div className="pet-hop">
             <div className="pet-bounce">
               <div style={{ position: 'relative', width: 96, height: 96 }}>

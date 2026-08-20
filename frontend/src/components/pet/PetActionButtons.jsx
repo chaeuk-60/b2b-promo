@@ -1,9 +1,9 @@
 // 펫 행동 버튼(8-wireframe.md 6번 / 승인된 목업 기준): 목욕/밥/쓰다듬기 3버튼 노출.
-// "밥"은 누르면 하위에 "기본 주식"/"특식 주기" 두 항목이 나오는 드롭다운이다 - 다만
-// API 자체는 여전히 완전히 분리된 별개 엔드포인트라(POST /pet/feed vs
-// /pet/feed-special-food) 1-domain-definition.md "특식 주기 버튼" 규칙(행동 분리)은
-// 그대로 지킨다. 여기서 "분리"는 UI 배치가 아니라 행동/효과가 섞이지 않는다는 뜻으로
-// 재해석했다(사용자 확인, 10-plan.md FE-8).
+// "밥"을 누르면 포켓몬 메뉴처럼 씬(초원 배경) 아래쪽에 겹쳐서 짧은 선택지가 뜬다 -
+// "밥" 또는 "특식"만 고르면 되고, 특식은 보유 목록에서 클릭 한 번으로 바로 준다(설명
+// 문구 없이 간단하게, 사용자 확인). API 자체는 여전히 완전히 분리된 별개 엔드포인트라
+// (POST /pet/feed vs /pet/feed-special-food) 1-domain-definition.md "특식 주기 버튼"
+// 규칙(행동 분리)은 그대로 지킨다 - "분리"는 UI가 아니라 행동/효과가 섞이지 않는다는 뜻.
 import { useState } from 'react';
 import { useBathePet, useFeedPet, useFeedSpecialFood, usePatPet, useFortune } from '../../hooks/usePetAction';
 import { useMyApplications } from '../../hooks/useMyApplications';
@@ -33,7 +33,6 @@ function PetActionButtons({ pet, onAction }) {
 
   const [showFeedMenu, setShowFeedMenu] = useState(false);
   const [showFoodPicker, setShowFoodPicker] = useState(false);
-  const [selectedPromotionId, setSelectedPromotionId] = useState(null);
 
   const { data: applications } = useMyApplications();
   // 특식은 한 번 급여하면 소모되므로(special_food_used_at) 아직 안 쓴 것만 보유 목록에 남긴다.
@@ -48,30 +47,28 @@ function PetActionButtons({ pet, onAction }) {
   const anyPending = bathe.isPending || feed.isPending || pat.isPending;
   const canShowFortune = pet.stage === '새끼' || pet.stage === '성체';
 
+  function closeFeedMenu() {
+    setShowFeedMenu(false);
+    setShowFoodPicker(false);
+  }
+
   function handleFeedBasic() {
     feed.mutate(undefined, {
       onSuccess: () => {
-        setShowFeedMenu(false);
+        closeFeedMenu();
         notify('feed');
       },
     });
   }
 
-  function openFoodPicker() {
-    setShowFoodPicker(true);
-  }
-
-  function handleFeedSpecial() {
-    if (!selectedPromotionId) return;
-    const selected = heldFoods.find((a) => a.promotion_id === selectedPromotionId);
+  function handleFeedSpecial(application) {
     feedSpecial.mutate(
-      { promotionId: selectedPromotionId },
+      { promotionId: application.promotion_id },
       {
         onSuccess: () => {
-          setShowFoodPicker(false);
-          setShowFeedMenu(false);
+          closeFeedMenu();
           onAction?.({
-            emoji: `${foodEmoji(selected?.special_food_id)}❤️`,
+            emoji: `${foodEmoji(application.special_food_id)}❤️`,
             text: pet.stage === '새끼' ? '우와 마시떠!!' : '완전 최고예요!!! 짱 냠냠 야미~!!',
           });
         },
@@ -88,7 +85,39 @@ function PetActionButtons({ pet, onAction }) {
   }
 
   return (
-    <div>
+    <div className="pet-actions-row">
+      {showFeedMenu && (
+        <div className="pet-feed-menu">
+          {!showFoodPicker ? (
+            <>
+              <button type="button" className="pixel-btn" onClick={handleFeedBasic} disabled={feed.isPending}>
+                밥
+              </button>
+              <button
+                type="button"
+                className="pixel-btn"
+                onClick={() => setShowFoodPicker(true)}
+                disabled={heldFoods.length === 0}
+              >
+                특식
+              </button>
+            </>
+          ) : (
+            heldFoods.map((application) => (
+              <button
+                type="button"
+                className="pixel-btn"
+                key={application.promotion_id}
+                onClick={() => handleFeedSpecial(application)}
+                disabled={feedSpecial.isPending}
+              >
+                {foodEmoji(application.special_food_id)} {application.title}
+              </button>
+            ))
+          )}
+        </div>
+      )}
+
       <button
         type="button"
         className="pixel-btn"
@@ -101,7 +130,7 @@ function PetActionButtons({ pet, onAction }) {
         type="button"
         className="pixel-btn"
         aria-expanded={showFeedMenu}
-        onClick={() => setShowFeedMenu((open) => !open)}
+        onClick={() => (showFeedMenu ? closeFeedMenu() : setShowFeedMenu(true))}
       >
         밥 {showFeedMenu ? '▲' : '▼'}
       </button>
@@ -124,49 +153,8 @@ function PetActionButtons({ pet, onAction }) {
         오늘의 운세
       </button>
 
-      {(bathe.isError || feed.isError || pat.isError || fortune.isError) && (
+      {(bathe.isError || feed.isError || pat.isError || fortune.isError || feedSpecial.isError) && (
         <p role="alert">행동 처리에 실패했습니다.</p>
-      )}
-
-      {showFeedMenu && !showFoodPicker && (
-        <div className="pixel-card">
-          <p>밥 선택</p>
-          <button type="button" className="pixel-btn" onClick={handleFeedBasic} disabled={feed.isPending}>
-            기본 주식 (쌀밥)
-            <br />
-            평범한 상태 회복, 특식 효과 없음
-          </button>
-          <button type="button" className="pixel-btn" onClick={openFoodPicker} disabled={heldFoods.length === 0}>
-            특식 주기 ›<br />
-            보유 특식 {heldFoods.length}개 중 선택해서 급여
-          </button>
-        </div>
-      )}
-
-      {showFeedMenu && showFoodPicker && (
-        <div className="pixel-card">
-          <p>줄 특식을 선택하세요</p>
-          {heldFoods.map((application) => (
-            <label key={application.promotion_id}>
-              <input
-                type="radio"
-                name="specialFood"
-                checked={selectedPromotionId === application.promotion_id}
-                onChange={() => setSelectedPromotionId(application.promotion_id)}
-              />
-              {foodEmoji(application.special_food_id)} {application.title}의 특식
-            </label>
-          ))}
-          {feedSpecial.isError && <p role="alert">특식 급여에 실패했습니다.</p>}
-          <button
-            type="button"
-            className="pixel-btn pixel-btn-primary"
-            onClick={handleFeedSpecial}
-            disabled={!selectedPromotionId || feedSpecial.isPending}
-          >
-            급여하기
-          </button>
-        </div>
       )}
     </div>
   );

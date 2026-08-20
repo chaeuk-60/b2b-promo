@@ -178,11 +178,11 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
   - [x] 묘비 상태일 때 "자주 오세요..." 메시지가 표시된다.
 
 ### FE-8. 펫 화면 - 행동 버튼
-- `frontend/src/hooks/usePetAction.js`(목욕/밥/특식주기/쓰다듬기/운세 useMutation), `frontend/src/components/pet/PetActionButtons.jsx`: 목욕/밥/쓰다듬기 3버튼 + "밥" 클릭 시 기본주식/특식주기 하위 메뉴(UI만 그룹핑, API는 `/pet/feed`·`/pet/feed-special-food`로 완전히 분리 유지 - `1-domain-definition.md` "특식 주기 버튼" 규칙) + 특식주기 시 보유 특식 목록에서 선택 + 오늘의 운세 버튼(새끼/성체 전용, `8-wireframe.md` "밥"/"특식 주기" 하위 화면).
+- `frontend/src/hooks/usePetAction.js`(목욕/밥/특식주기/쓰다듬기/운세 useMutation), `frontend/src/components/pet/PetActionButtons.jsx`: 목욕/밥/쓰다듬기 3버튼 + "밥" 클릭 시 씬 배경 아래쪽에 겹쳐서 뜨는 "밥"/"특식" 짧은 메뉴(설명 문구 없이 라벨만, 사용자 확인 - API는 `/pet/feed`·`/pet/feed-special-food`로 완전히 분리 유지, `1-domain-definition.md` "특식 주기 버튼" 규칙) + "특식" 선택 시 보유 특식이 짧은 이름으로 나열되어 클릭 한 번으로 급여 + 오늘의 운세 버튼(새끼/성체 전용, `8-wireframe.md` "밥"/"특식" 하위 화면).
 - 선행: BE-6, BE-8, FE-7
 - 완료 조건:
   - [x] 목욕/밥/쓰다듬기 버튼 클릭 시 펫 상태가 갱신되어 화면에 반영된다.
-  - [x] 보유 특식이 없으면 "특식 주기" 버튼이 비활성화되고, 있으면 목록에서 선택해 급여할 수 있다.
+  - [x] 보유 특식이 없으면 "특식" 버튼이 비활성화되고, 있으면 목록에서 선택해 급여할 수 있다.
   - [x] 오늘의 운세 버튼은 알 단계에서 비활성/미노출이고, 새끼/성체에서만 결과가 표시된다.
 
 ### FE-9. 관리자 프로모션 등록/수정 화면

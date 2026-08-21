@@ -8,8 +8,16 @@ export function useToggleFavorite() {
 
   return useMutation({
     mutationFn: toggleFavorite,
+    // 버그: 목록 쿼리(['promotions'])만 무효화해서 상세 화면(['promotion', id])은 API가
+    // 성공해도 찜 상태가 화면에 반영되지 않았다(사용자 확인: "상세페이지 찜 잘 안된다").
+    // id 타입이 호출부마다 문자열/숫자로 섞여 들어올 수 있어(useParams는 문자열, 목록
+    // 응답은 DB bigint 문자열) queryKey 완전 일치 대신 predicate로 'promotion' 상세
+    // 쿼리를 전부 무효화한다.
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['promotions'] });
+      queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === 'promotion',
+      });
     },
   });
 }

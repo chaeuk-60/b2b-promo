@@ -12,14 +12,15 @@ function PromotionCard({ promotion }) {
 
   return (
     <div className="pixel-card">
-      {/* 창 제목표시줄(pixel-titlebar) - 펫 팝업과 같은 톤으로 통일. 제목을 눌러도
-          상세로 갈 수 있게 링크로 둔다(기간 종료 카드는 목록에 다른 링크가 없어
-          상세 화면 자체에 도달할 방법이 없었던 문제도 같이 해결됨). */}
-      <div className="pixel-titlebar">
-        <Link className="pixel-titlebar-title" to={`/promotions/${promotion.id}`}>
+      {/* 목록 카드는 제목표시줄 없이 일반 제목으로(사용자 확인: 파란 상태줄이 목록에서는
+          답답해 보임 - 펫 팝업/상세는 그대로 유지). 제목은 눌러도 상세로 갈 수 있게 링크로
+          둔다(기간 종료 카드는 목록에 다른 링크가 없어 상세 화면에 도달할 방법이 없었던
+          문제도 같이 해결됨). */}
+      <h3>
+        <Link to={`/promotions/${promotion.id}`}>
           {foodEmoji(promotion.special_food_id)} {promotion.title}
         </Link>
-      </div>
+      </h3>
       <p>
         기간: {promotion.start_date} ~ {promotion.end_date}
       </p>

@@ -16,8 +16,8 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 - BE 작업 중 뒤늦게 필요해진 컬럼(daily_login_count, fortune_message, fortune_date, applications.special_food_used_at)과 FK 제약 조정(requested_promotion_id ON DELETE SET NULL)은 `9-schema.sql`에도 반영하고, `002_pet_daily_login_count.sql`/`003_pets_requested_promotion_fk_set_null.sql`/`004_pet_fortune.sql`/`005_applications_special_food_used_at.sql` 후속 마이그레이션으로 나눠 적용한다(001_init.sql은 최초 버전으로 유지, 되돌리지 않는다).
 - 선행: 없음
 - 완료 조건:
-  - [x] `backend/src/db/migrations/001_init.sql` 파일이 최초 버전 `9-schema.sql`과 동일한 내용으로 생성되어 있고, 이후 스키마 변경은 002~004 후속 마이그레이션으로 관리된다.
-  - [x] 로컬 DB에 마이그레이션(001~004)을 순서대로 실행해 `users/refresh_tokens/promotions/applications/favorites/pets` 6개 테이블이 `9-schema.sql`(최신 버전) 그대로 생성된다.
+  - [x] `backend/src/db/migrations/001_init.sql` 파일이 최초 버전 `9-schema.sql`과 동일한 내용으로 생성되어 있고, 이후 스키마 변경은 002~005 후속 마이그레이션으로 관리된다.
+  - [x] 로컬 DB에 마이그레이션(001~005)을 순서대로 실행해 `users/refresh_tokens/promotions/applications/favorites/pets` 6개 테이블이 `9-schema.sql`(최신 버전) 그대로 생성된다. 운영(production) Supabase DB에도 `9-schema.sql`(001~005 반영된 최신본)을 그대로 적용해 같은 6개 테이블 구성으로 생성 완료(2026-08-21).
 
 ### DB-2. pg 연결 풀 모듈 및 환경변수 정의
 - `backend/src/db/pool.js`에 `pg.Pool`을 생성하고 export하는 모듈을 작성한다(`DATABASE_URL` 환경변수 사용).

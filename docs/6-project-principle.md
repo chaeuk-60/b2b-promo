@@ -107,8 +107,12 @@ backend/src/
     pet.service.js          # 5장 상태머신 전체(전이/확률/특식요청/선물지급/사망/성체순환)
   jobs/
     dailyReset.js          # (선택) 자정 배치가 필요하면 여기. 아니면 로그인 시점 lazy 계산으로 대체 가능
-  app.js                    # express 앱 조립, 미들웨어 등록
-  server.js                 # listen
+  app.js                    # express 앱 팩토리(createApp) - 미들웨어/에러 핸들러 등록
+  buildApp.js               # 실제 라우트 등록 + 로컬 전용 Swagger UI(createApp 위에서 조립)
+  server.js                 # buildApp()으로 만든 앱을 app.listen(로컬/일반 Node 호스팅용)
+backend/api/
+  index.js                  # Vercel 서버리스 진입점 - buildApp()을 그대로 내보냄(listen 없음)
+backend/vercel.json          # 모든 경로를 api/index.js로 라우팅(모노레포라 Root Directory를 backend로 지정해야 함)
 ```
 
 - **`pet.service.js`가 이 프로젝트에서 가장 복잡한 파일**이 되는 것을 인정하고, 억지로 잘게 쪼개지 않는다. 다만 함수는 규칙 단위로 분리한다: `resolveMoodOnLogin`, `applyAction(action)`, `feedSpecialFood`, `checkStageTransition`, `checkDeathOrCycle`, `maybeGrantGift`. 이 정도 함수 분리로 충분하며, 이걸 다시 여러 클래스/전략 패턴으로 감싸지 않는다.

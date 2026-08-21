@@ -143,7 +143,7 @@ function AdminPromotionsPage() {
         )}
       </div>
 
-      <h3>등록된 프로모션</h3>
+      <h3 className="heading-outline">등록된 프로모션</h3>
       {(promotions || []).map((promotion) => (
         <div className="pixel-card" key={promotion.id}>
           <p>{promotion.title}</p>

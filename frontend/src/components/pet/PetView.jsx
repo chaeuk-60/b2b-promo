@@ -98,7 +98,7 @@ function PetView({ pet, reaction }) {
       <div>
         {pet.name && (
           <p>
-            이름: <span className="promo-card-title-highlight">{pet.name}</span>
+            이름: <span className="pet-name-highlight">{pet.name}</span>
           </p>
         )}
         <div className="pet-scene">
@@ -115,7 +115,7 @@ function PetView({ pet, reaction }) {
     return (
       <div>
         <p className="pet-name-status">
-          <span className="promo-card-title-highlight">{pet.name}</span>
+          <span className="pet-name-highlight">{pet.name}</span>
         </p>
         <div className="pet-scene">
           {/* 다리가 없어 좌우로 돌아다니지 못하고 제자리에서 흔들리는 idle 모션만 가진다.
@@ -147,7 +147,7 @@ function PetView({ pet, reaction }) {
   return (
     <div>
       <p className="pet-name-status">
-        <span className="promo-card-title-highlight">{pet.name}</span>
+        <span className="pet-name-highlight">{pet.name}</span>
       </p>
       <div className={`pet-scene${isSpotlight ? ' pet-scene-spotlight' : ''}`}>
         {/* 말풍선을 pet-wander 안에 같이 둬서 펫을 따라다니게 한다(길면 줄바꿈해서 씬

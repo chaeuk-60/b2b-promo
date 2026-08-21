@@ -7,9 +7,10 @@ import PromotionCard from './PromotionCard';
 
 vi.mock('../../api/promotion.api', () => ({
   toggleFavorite: vi.fn(),
+  applyPromotion: vi.fn(),
 }));
 
-import { toggleFavorite } from '../../api/promotion.api';
+import { toggleFavorite, applyPromotion } from '../../api/promotion.api';
 
 function renderCard(promotion) {
   const queryClient = new QueryClient();
@@ -71,19 +72,27 @@ describe('PromotionCard', () => {
     expect(screen.getByText('※ 담당자에게 연락 주세요')).toBeInTheDocument();
   });
 
-  it('기간 내이고 신청 전이면 신청하기 링크가 표시된다', () => {
+  it('기간 내이고 신청 전이면 신청하기 버튼과 상세보기 링크가 표시된다', () => {
     renderCard(basePromotion);
 
-    expect(screen.getByRole('link', { name: '신청하기' })).toHaveAttribute(
-      'href',
-      '/promotions/1'
-    );
+    expect(screen.getByRole('button', { name: '신청하기' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: '상세보기' })).toHaveAttribute('href', '/promotions/1');
+  });
+
+  it('신청하기를 누르면 상세로 이동하지 않고 applyPromotion API가 호출된다', async () => {
+    applyPromotion.mockResolvedValue({});
+    renderCard(basePromotion);
+
+    fireEvent.click(screen.getByRole('button', { name: '신청하기' }));
+
+    await waitFor(() => expect(applyPromotion).toHaveBeenCalled());
+    expect(applyPromotion.mock.calls[0][0]).toBe(1);
   });
 
   it('이미 신청 완료했으면 신청 완료 표시가 나온다', () => {
     renderCard({ ...basePromotion, applied: true });
 
     expect(screen.getByText('신청 완료')).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: '신청하기' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: '신청하기' })).not.toBeInTheDocument();
   });
 });

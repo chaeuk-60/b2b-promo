@@ -6,7 +6,10 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import PetPanel from '../pet/PetPanel';
 import { usePet } from '../../hooks/usePet';
+import useAuthStore from '../../store/auth.store';
 import { bodySpriteUrl, eggSpriteUrl, TOMBSTONE_SPRITE_URL } from '../../utils/petSprite';
+
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'admin@b2b-promo.com';
 
 // 와이어프레임 3번 "펫 보기는 텍스트 버튼 대신 스프라이트 축소판"에 맞춰 실제 펫 이미지를
 // 버튼 아이콘으로 쓴다. usePet()은 PetPanel과 같은 쿼리 키(['pet'])를 쓰므로 TanStack
@@ -25,6 +28,8 @@ function Layout({ children }) {
   const [showPetPopup, setShowPetPopup] = useState(false);
   const { data: pet } = usePet();
   const thumbnailUrl = navThumbnailUrl(pet);
+  const user = useAuthStore((state) => state.user);
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   return (
     <div>
@@ -43,6 +48,14 @@ function Layout({ children }) {
         >
           📄 <span className="app-nav-label">나의 신청 목록</span>
         </NavLink>
+        {isAdmin && (
+          <NavLink
+            to="/admin/promotions"
+            className={({ isActive }) => `pixel-btn${isActive ? ' pixel-tab-active' : ''}`}
+          >
+            🛠 <span className="app-nav-label">관리자</span>
+          </NavLink>
+        )}
         <button
           type="button"
           className="pixel-btn app-nav-pet-toggle"

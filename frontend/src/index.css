@@ -253,6 +253,11 @@ a {
   background: linear-gradient(180deg, transparent 55%, #fff3a0 55%);
 }
 
+/* 펫 이름은 프로모션 제목과 구분되게 핑크 하이라이트로(사용자 확인). */
+.pet-name-highlight {
+  background: linear-gradient(180deg, transparent 55%, #ffc9e6 55%);
+}
+
 /* "취소/기간종료 안내"는 본문보다 작게, 당구장 표시(※)를 붙여 각주처럼 보이게 한다
    (사용자 확인). */
 .promo-card-note {

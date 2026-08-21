@@ -162,7 +162,9 @@ async function refreshAccessToken({ refreshToken }) {
     expiresIn: ACCESS_EXPIRES,
   });
 
-  return { accessToken };
+  // user도 같이 내려준다 - 프론트가 새로고침/재방문 시 이 응답만으로 로그인 사용자 정보를
+  // 복원할 수 있어야 한다(관리자 판별 등 user.email에 의존하는 화면이 있음).
+  return { accessToken, user: { id: user.id, email: user.email } };
 }
 
 async function logout({ refreshToken }) {

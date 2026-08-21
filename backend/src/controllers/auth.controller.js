@@ -45,8 +45,8 @@ async function login(req, res, next) {
 async function refresh(req, res, next) {
   try {
     const refreshToken = getCookie(req, 'refreshToken');
-    const { accessToken } = await authService.refreshAccessToken({ refreshToken });
-    res.status(200).json({ accessToken });
+    const { accessToken, user } = await authService.refreshAccessToken({ refreshToken });
+    res.status(200).json({ accessToken, user });
   } catch (err) {
     next(err);
   }

@@ -162,6 +162,10 @@ test('정상 로그인 후 발급받은 리프레시 토큰 쿠키로 재발급 
 
   assert.equal(res.status, 200);
   assert.equal(typeof res.body.accessToken, 'string');
+  // user도 같이 내려줘야 프론트가 새로고침 시 로그인 사용자 정보(관리자 판별 등)를
+  // 이 응답만으로 복원할 수 있다.
+  assert.equal(res.body.user.id, userId);
+  assert.equal(res.body.user.email, email);
 });
 
 test('이메일/비밀번호 없이 회원가입하면 400 에러가 반환된다', async () => {

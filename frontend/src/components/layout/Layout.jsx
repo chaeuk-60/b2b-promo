@@ -11,8 +11,11 @@ import { bodySpriteUrl, eggSpriteUrl, TOMBSTONE_SPRITE_URL } from '../../utils/p
 // 와이어프레임 3번 "펫 보기는 텍스트 버튼 대신 스프라이트 축소판"에 맞춰 실제 펫 이미지를
 // 버튼 아이콘으로 쓴다. usePet()은 PetPanel과 같은 쿼리 키(['pet'])를 쓰므로 TanStack
 // Query가 요청을 중복 없이 캐시/공유한다(네트워크 요청이 두 번 나가지 않는다).
+// 이름이 아직 없으면(펫 팝업을 열어야 이름 짓기 폼이 뜨는 상태) 알/펫 스프라이트 대신
+// 발자국 이모지(🐾, thumbnailUrl null -> 아래 폴백)로 "아직 정해지지 않은 펫"임을
+// 보여준다(사용자 확인).
 function navThumbnailUrl(pet) {
-  if (!pet) return null;
+  if (!pet || !pet.name) return null;
   if (pet.stage === '묘비') return TOMBSTONE_SPRITE_URL;
   if (pet.stage === '알') return eggSpriteUrl(pet.egg_state);
   return bodySpriteUrl(pet.stage, pet.ear_type);

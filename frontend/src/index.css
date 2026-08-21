@@ -322,6 +322,12 @@ a {
   color: var(--ink);
 }
 
+/* 아이콘/이모지와 글자 라벨 사이 간격(사용자 확인: 너무 붙어 보임) - inline-flex 버튼 안
+   텍스트 노드 사이의 공백이 레이아웃에 따라 씹힐 수 있어 gap으로 확실히 띄운다. */
+.app-nav .pixel-btn {
+  gap: 4px;
+}
+
 /* 현재 페이지 탭 강조 - 제목표시줄과 같은 brand-blue로 "눌려서 열려있는 탭" 느낌을 낸다. */
 .pixel-tab-active::before {
   background: var(--brand-blue);

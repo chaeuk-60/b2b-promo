@@ -141,7 +141,7 @@ function PetView({ pet, reaction }) {
     : isWalkingAdult
       ? adultWalkFrameUrl(pet.ear_type, legFrame)
       : bodySpriteUrl(pet.stage, pet.ear_type);
-  const overlayUrl = isHappy ? null : moodOverlayUrl(pet.mood);
+  const overlayUrl = isHappy ? null : moodOverlayUrl(pet.stage, pet.ear_type, pet.mood, legFrame);
   const bubbleText = reaction ? `${reaction.emoji} ${reaction.text}` : ambientMood;
 
   return (

@@ -48,9 +48,22 @@ export function eggSpriteUrl(eggState) {
   return `/images/egg-${(eggState || '평범').replace(' ', '')}.svg`;
 }
 
-export function moodOverlayUrl(mood) {
+// 버그 수정: mood 오버레이가 동물 종류와 무관하게 딱 1장(토끼 팔레트로 그려진 파일)
+// 뿐이라, 다른 동물(ear_type) 몸통 위에 토끼색 오버레이가 겹쳐져 "두 동물이 합쳐진"
+// 것처럼 보였다(사용자 확인 스크린샷). stage+ear_type으로 동물별/단계별 합성 파일
+// (스크립트로 생성, mood-평범.svg를 기준으로 다른 mood들의 픽셀 차이만 뽑아 각 동물의
+// 원래 윤곽/얼굴색 위에 적용)을 대신 쓴다.
+// legFrame(0/1/2)은 adultWalkFrameUrl과 같은 다리 교차 프레임 - 오버레이가 몸통을
+// 완전히 덮어 그리는 불투명 이미지라, 몸통만 프레임을 바꿔도 오버레이가 항상 같은
+// (다리 붙어 있는) 모습을 덮어써서 다리 움직임이 안 보이던 버그를 고친다(사용자 확인:
+// "얘는 다리 안움직이는데"). 새끼는 다리 프레임이 없어 legFrame을 무시한다.
+export function moodOverlayUrl(stage, earType, mood, legFrame = 0) {
   if (!mood || mood === '행복') return null; // 행복은 정적 오버레이 대신 걷기 애니메이션으로 표현
-  return `/images/mood-${mood.replace(' ', '')}.svg`;
+  const animal = EAR_TO_ANIMAL[earType] || 'cat';
+  const prefix = stage === '새끼' ? 'baby' : 'adult';
+  const moodKey = mood.replace(' ', '');
+  const walkSuffix = prefix === 'adult' && legFrame > 0 ? `-walk-${legFrame + 1}` : '';
+  return `/images/${prefix}-${animal}-mood-${moodKey}${walkSuffix}.svg`;
 }
 
 export const HAPPY_WALK_FRAMES = ['/images/happy-walk-1.svg', '/images/happy-walk-2.svg', '/images/happy-walk-3.svg'];

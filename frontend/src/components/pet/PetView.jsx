@@ -96,7 +96,11 @@ function PetView({ pet, reaction }) {
   if (pet.stage === '묘비') {
     return (
       <div>
-        {pet.name && <p>이름: {pet.name}</p>}
+        {pet.name && (
+          <p>
+            이름: <span className="promo-card-title-highlight">{pet.name}</span>
+          </p>
+        )}
         <div className="pet-scene">
           <img src={TOMBSTONE_SPRITE_URL} alt="묘비" width={96} height={96} style={{ imageRendering: 'pixelated' }} />
         </div>
@@ -110,7 +114,9 @@ function PetView({ pet, reaction }) {
     const bubbleText = reaction ? reaction.emoji : ambientEgg;
     return (
       <div>
-        <p className="pet-name-status">{pet.name}</p>
+        <p className="pet-name-status">
+          <span className="promo-card-title-highlight">{pet.name}</span>
+        </p>
         <div className="pet-scene">
           {/* 다리가 없어 좌우로 돌아다니지 못하고 제자리에서 흔들리는 idle 모션만 가진다.
               말풍선을 펫과 같이 묶어서 펫이 말하는 것처럼 보이게 한다(길면 줄바꿈). */}
@@ -140,7 +146,9 @@ function PetView({ pet, reaction }) {
 
   return (
     <div>
-      <p className="pet-name-status">{pet.name}</p>
+      <p className="pet-name-status">
+        <span className="promo-card-title-highlight">{pet.name}</span>
+      </p>
       <div className={`pet-scene${isSpotlight ? ' pet-scene-spotlight' : ''}`}>
         {/* 말풍선을 pet-wander 안에 같이 둬서 펫을 따라다니게 한다(길면 줄바꿈해서 씬
             밖으로 삐져나가지 않게 함). 운세(spotlight)일 때는 펫도 가운데로 멈춰 세운다. */}

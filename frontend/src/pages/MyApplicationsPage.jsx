@@ -18,8 +18,10 @@ function MyApplicationsPage() {
       ) : (
         applications.map((application) => (
           <div className="pixel-card" key={application.id}>
-            <h3>
-              {foodEmoji(application.special_food_id)} {application.title}
+            {/* 프로모션 목록 카드와 같은 형광펜 하이라이트(사용자 확인). */}
+            <h3 className="promo-card-title">
+              {foodEmoji(application.special_food_id)}{' '}
+              <span className="promo-card-title-highlight">{application.title}</span>
             </h3>
             <p>신청일: {application.applied_at.slice(0, 10)}</p>
             <p>

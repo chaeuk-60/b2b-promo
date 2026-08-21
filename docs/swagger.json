@@ -165,6 +165,23 @@
     }
   },
   "paths": {
+    "/health": {
+      "get": {
+        "tags": ["health"],
+        "summary": "헬스체크",
+        "description": "배포/모니터링용. 인증이나 DB 조회 없이 서버 프로세스가 떠 있는지만 확인한다.",
+        "responses": {
+          "200": {
+            "description": "정상",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "properties": { "status": { "type": "string", "example": "ok" } } }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/signup": {
       "post": {
         "tags": ["auth"],

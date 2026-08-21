@@ -11,6 +11,9 @@ const applicationRoutes = require('./routes/application.routes');
 const isProduction = process.env.NODE_ENV === 'production';
 
 const app = createApp((app) => {
+  // 배포/모니터링용 헬스체크: 인증/DB 조회 없이 서버 프로세스가 떠 있는지만 확인한다.
+  app.get('/health', (req, res) => res.status(200).json({ status: 'ok' }));
+
   app.use('/auth', authRoutes);
   app.use('/pet', petRoutes);
   app.use('/promotions', promotionRoutes);

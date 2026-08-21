@@ -249,6 +249,10 @@ a {
     여기서는 목록과 같은 잉크색+하이라이트로 통일한다(사용자 확인: "파란색에서 빼고") */
 }
 
+.promo-card-clickable {
+  cursor: pointer;
+}
+
 .promo-card-title-highlight {
   background: linear-gradient(180deg, transparent 55%, #fff3a0 55%);
 }
@@ -278,6 +282,20 @@ a {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* 로그인 버튼 + 실패 메시지를 한 그룹으로 묶어 login-actions-row의 space-between
+   아래서도 메시지가 로그인 버튼에 붙어 보이게 한다(사용자 확인: "로그인 버튼
+   오른쪽 옆"). */
+.login-button-with-error {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.login-inline-error {
+  font-size: 12px;
+  margin: 0;
 }
 
 /* input은 대체 요소(replaced element)라 ::before/::after 생성 콘텐츠를 지원하지 않아

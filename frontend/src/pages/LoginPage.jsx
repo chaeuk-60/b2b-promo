@@ -79,25 +79,36 @@ function LoginPage() {
                 기존 DOM 버튼의 type 속성만 바꿔치기하면, 클릭이 끝나기 전에 type이
                 button -> submit으로 바뀌어 의도치 않게 폼이 제출되는 브라우저 동작이 있다
                 (버그: "회원가입"으로 전환만 했는데 곧바로 제출까지 되던 문제). */}
-            {mode === 'login' ? (
-              <button
-                key="login-submit"
-                type="submit"
-                className="pixel-btn pixel-btn-primary"
-                disabled={isSubmitting}
-              >
-                로그인
-              </button>
-            ) : (
-              <button
-                key="login-toggle"
-                type="button"
-                className="pixel-btn"
-                onClick={() => switchMode('login')}
-              >
-                로그인
-              </button>
-            )}
+            {/* 로그인/회원가입 실패 메시지는 아래로 빼지 않고 로그인 버튼 바로 오른쪽에
+                붙인다(사용자 확인). 버튼과 한 그룹으로 묶어야 login-actions-row의
+                space-between 아래서도 로그인 버튼에 딱 붙어 보인다(회원가입 버튼은
+                계속 오른쪽 끝 고정). */}
+            <div className="login-button-with-error">
+              {mode === 'login' ? (
+                <button
+                  key="login-submit"
+                  type="submit"
+                  className="pixel-btn pixel-btn-primary"
+                  disabled={isSubmitting}
+                >
+                  로그인
+                </button>
+              ) : (
+                <button
+                  key="login-toggle"
+                  type="button"
+                  className="pixel-btn"
+                  onClick={() => switchMode('login')}
+                >
+                  로그인
+                </button>
+              )}
+              {errorMessage && (
+                <p role="alert" className="login-inline-error">
+                  {errorMessage}
+                </p>
+              )}
+            </div>
             {mode === 'signup' ? (
               <button
                 key="signup-submit"
@@ -119,8 +130,6 @@ function LoginPage() {
             )}
           </div>
         </form>
-
-        {errorMessage && <p role="alert">{errorMessage}</p>}
       </div>
     </div>
   );

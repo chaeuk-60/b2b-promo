@@ -1,7 +1,7 @@
 // FE-4 완료 조건: 찜 토글, 기간 종료 시 신청 버튼 비활성화+안내 문구.
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PromotionCard from './PromotionCard';
 
@@ -16,8 +16,11 @@ function renderCard(promotion) {
   const queryClient = new QueryClient();
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>
-        <PromotionCard promotion={promotion} />
+      <MemoryRouter initialEntries={['/promotions']}>
+        <Routes>
+          <Route path="/promotions" element={<PromotionCard promotion={promotion} />} />
+          <Route path="/promotions/:id" element={<p>상세 화면</p>} />
+        </Routes>
       </MemoryRouter>
     </QueryClientProvider>
   );
@@ -72,14 +75,21 @@ describe('PromotionCard', () => {
     expect(screen.getByText('※ 담당자에게 연락 주세요')).toBeInTheDocument();
   });
 
-  it('기간 내이고 신청 전이면 신청하기 버튼과 상세보기 링크가 표시된다', () => {
+  it('기간 내이고 신청 전이면 신청하기 버튼이 표시된다', () => {
     renderCard(basePromotion);
 
     expect(screen.getByRole('button', { name: '신청하기' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: '상세보기' })).toHaveAttribute('href', '/promotions/1');
   });
 
-  it('신청하기를 누르면 상세로 이동하지 않고 applyPromotion API가 호출된다', async () => {
+  it('카드를 클릭하면 상세 화면으로 이동한다', async () => {
+    renderCard(basePromotion);
+
+    fireEvent.click(screen.getByRole('link', { name: /여름맞이 쌀 증정/ }));
+
+    expect(await screen.findByText('상세 화면')).toBeInTheDocument();
+  });
+
+  it('신청하기 버튼을 클릭하면 카드 클릭(상세 이동)으로 전파되지 않고 applyPromotion만 호출된다', async () => {
     applyPromotion.mockResolvedValue({});
     renderCard(basePromotion);
 
@@ -87,6 +97,7 @@ describe('PromotionCard', () => {
 
     await waitFor(() => expect(applyPromotion).toHaveBeenCalled());
     expect(applyPromotion.mock.calls[0][0]).toBe(1);
+    expect(screen.queryByText('상세 화면')).not.toBeInTheDocument();
   });
 
   it('이미 신청 완료했으면 신청 완료 표시가 나온다', () => {

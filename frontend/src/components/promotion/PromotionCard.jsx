@@ -16,9 +16,11 @@ function PromotionCard({ promotion }) {
           답답해 보임 - 펫 팝업/상세는 그대로 유지). 제목은 눌러도 상세로 갈 수 있게 링크로
           둔다(기간 종료 카드는 목록에 다른 링크가 없어 상세 화면에 도달할 방법이 없었던
           문제도 같이 해결됨). */}
+      {/* 제목 밑줄 대신 형광펜으로 칠한 듯한 옅은 하이라이트로 강조(사용자 확인,
+          이모지에는 하이라이트를 넣지 않고 제목 글자에만 건다). */}
       <h3>
-        <Link to={`/promotions/${promotion.id}`}>
-          {foodEmoji(promotion.special_food_id)} {promotion.title}
+        <Link className="promo-card-title" to={`/promotions/${promotion.id}`}>
+          {foodEmoji(promotion.special_food_id)} <span className="promo-card-title-highlight">{promotion.title}</span>
         </Link>
       </h3>
       <p>

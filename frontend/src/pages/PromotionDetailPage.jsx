@@ -22,10 +22,8 @@ function PromotionDetailPage() {
     <div>
       <Link to="/promotions">{'< 목록으로'}</Link>
       <div className="pixel-card">
-        {/* 창 제목표시줄(pixel-titlebar) - 프로모션 카드/펫 팝업과 같은 톤으로 통일. */}
-        <div className="pixel-titlebar">
-          <h2 className="pixel-titlebar-title">{promotion.title}</h2>
-        </div>
+        {/* 나의 신청 목록 카드와 같은 톤으로(사용자 확인: 제목표시줄 없이 일반 제목). */}
+        <h2>{promotion.title}</h2>
         <p>
           기간: {promotion.start_date} ~ {promotion.end_date}
         </p>

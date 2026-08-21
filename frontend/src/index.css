@@ -240,6 +240,17 @@ a {
   margin-left: 0; /* gap이 간격을 담당하므로 중복 마진 제거 */
 }
 
+/* 목록 카드 제목: 밑줄 대신 형광펜으로 칠한 듯한 옅은 하이라이트(사용자 확인).
+   이모지는 그대로 두고 제목 글자에만 하이라이트를 건다. */
+.promo-card-title {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.promo-card-title-highlight {
+  background: linear-gradient(180deg, transparent 55%, #fff3a0 55%);
+}
+
 /* input은 대체 요소(replaced element)라 ::before/::after 생성 콘텐츠를 지원하지 않아
    위의 이중 레이어 트릭을 쓸 수 없다. 노치 대신 단순 사각형 + 살짝만 둥근 처리로 대신한다. */
 .pixel-input {

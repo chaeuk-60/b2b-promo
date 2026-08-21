@@ -22,8 +22,11 @@ function PromotionDetailPage() {
     <div>
       <Link to="/promotions">{'< 목록으로'}</Link>
       <div className="pixel-card">
-        {/* 나의 신청 목록 카드와 같은 톤으로(사용자 확인: 제목표시줄 없이 일반 제목). */}
-        <h2>{promotion.title}</h2>
+        {/* 나의 신청 목록 카드와 같은 톤으로(사용자 확인: 제목표시줄 없이 일반 제목).
+            목록과 같은 형광펜 하이라이트 + 파란색 대신 일반 잉크색(사용자 확인). */}
+        <h2 className="promo-card-title">
+          <span className="promo-card-title-highlight">{promotion.title}</span>
+        </h2>
         <p>
           기간: {promotion.start_date} ~ {promotion.end_date}
         </p>

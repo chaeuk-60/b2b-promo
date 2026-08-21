@@ -245,6 +245,8 @@ a {
 .promo-card-title {
   color: var(--ink);
   text-decoration: none;
+  text-shadow: none; /* 상세 화면 h2는 전역 h1/h2 규칙(브랜드블루+흰 아웃라인)을 쓰는데
+    여기서는 목록과 같은 잉크색+하이라이트로 통일한다(사용자 확인: "파란색에서 빼고") */
 }
 
 .promo-card-title-highlight {

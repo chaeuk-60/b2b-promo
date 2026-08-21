@@ -79,7 +79,7 @@ describe('LoginPage', () => {
     );
   });
 
-  it('회원가입 모드로 전환 후 제출하면 signup과 login이 순서대로 호출되고 이동한다', async () => {
+  it('회원가입 버튼을 한 번 클릭하면 signup과 login이 순서대로 호출되고 이동한다', async () => {
     signup.mockResolvedValue({ user: { id: 2, email: 'b@example.com' }, pet: { name: null } });
     login.mockResolvedValue({
       accessToken: 'token',
@@ -88,7 +88,6 @@ describe('LoginPage', () => {
     });
     renderLoginPage();
 
-    fireEvent.click(screen.getByRole('button', { name: '회원가입' }));
     fireEvent.change(screen.getByLabelText('이메일'), { target: { value: 'b@example.com' } });
     fireEvent.change(screen.getByLabelText('비밀번호'), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: '회원가입' }));
@@ -100,9 +99,9 @@ describe('LoginPage', () => {
     expect(login.mock.calls[0][0]).toEqual({ email: 'b@example.com', password: 'password123' });
   });
 
-  // 버그 수정: 로그인 실패 후 회원가입으로 전환해 다시 실패하면, 이전 로그인 에러가 아니라
+  // 버그 수정: 로그인 실패 후 회원가입 버튼을 눌러 다시 실패하면, 이전 로그인 에러가 아니라
   // 방금 실패한 회원가입 에러가 표시돼야 한다(모드 전환 시 mutation 상태 리셋).
-  it('로그인 실패 후 회원가입으로 전환해 실패하면 이전 로그인 에러가 아니라 회원가입 에러가 표시된다', async () => {
+  it('로그인 실패 후 회원가입을 클릭해 실패하면 이전 로그인 에러가 아니라 회원가입 에러가 표시된다', async () => {
     login.mockRejectedValue({
       response: { data: { error: { message: '이메일 또는 비밀번호가 올바르지 않습니다.' } } },
     });
@@ -123,7 +122,6 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: '회원가입' }));
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: '회원가입' }));
     await waitFor(() =>
       expect(screen.getByRole('alert')).toHaveTextContent('이미 가입된 이메일입니다.')
     );

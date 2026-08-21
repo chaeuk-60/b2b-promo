@@ -278,6 +278,18 @@ a {
 }
 
 /* 로그인/회원가입 버튼을 한 줄에 좌우로 배치(사용자 확인). */
+/* 화면엔 안 보이지만 폼의 Enter 키 제출(암묵적 제출)을 위해 남겨두는 진짜 submit 버튼. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
 .login-actions-row {
   display: flex;
   justify-content: space-between;

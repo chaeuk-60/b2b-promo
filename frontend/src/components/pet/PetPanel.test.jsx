@@ -18,7 +18,7 @@ vi.mock('../../api/application.api', () => ({
   listMyApplications: vi.fn(),
 }));
 
-import { getPet, patPet } from '../../api/pet.api';
+import { getPet, patPet, namePet } from '../../api/pet.api';
 import { listMyApplications } from '../../api/application.api';
 
 function renderPanel() {
@@ -31,6 +31,10 @@ function renderPanel() {
 }
 
 describe('PetPanel', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('펫 조회 성공 시 이름이 표시된다', async () => {
     getPet.mockResolvedValue({ stage: '알', egg_state: '평범', name: '김커푸' });
     listMyApplications.mockResolvedValue([]);
@@ -62,5 +66,36 @@ describe('PetPanel', () => {
     await waitFor(() => expect(screen.queryByText('❤️ 완전 좋아요~')).not.toBeInTheDocument());
 
     vi.useRealTimers();
+  });
+
+  // FE-3: 별도 페이지 대신 펫 팝업을 처음 열 때 이름이 없으면 여기서 바로 짓는다.
+  it('펫 이름이 없으면 이름 짓기 폼이 뜨고, 이름을 지으면 그 자리에서 평소 펫 화면으로 바뀐다', async () => {
+    getPet
+      .mockResolvedValueOnce({ stage: '알', egg_state: '평범', name: null })
+      .mockResolvedValue({ stage: '알', egg_state: '평범', name: '몽실이' });
+    listMyApplications.mockResolvedValue([]);
+    namePet.mockResolvedValue({});
+    renderPanel();
+
+    expect(await screen.findByText('펫에게 이름을 지어주세요')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('이름'), { target: { value: '몽실이' } });
+    fireEvent.click(screen.getByRole('button', { name: '확인' }));
+
+    await waitFor(() => expect(namePet).toHaveBeenCalled());
+    expect(namePet.mock.calls[0][0]).toEqual({ name: '몽실이' });
+    expect(await screen.findByText('몽실이')).toBeInTheDocument();
+  });
+
+  it('이름 짓기에서 건너뛰기를 누르면 기본 이름으로 저장된다', async () => {
+    getPet.mockResolvedValue({ stage: '알', egg_state: '평범', name: null });
+    listMyApplications.mockResolvedValue([]);
+    namePet.mockResolvedValue({});
+    renderPanel();
+
+    fireEvent.click(await screen.findByRole('button', { name: '건너뛰기' }));
+
+    await waitFor(() => expect(namePet).toHaveBeenCalled());
+    expect(namePet.mock.calls[0][0]).toEqual({ name: '김커푸' });
   });
 });

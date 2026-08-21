@@ -1,6 +1,8 @@
-// 로그인/회원가입 폼(같은 화면에서 전환, 8-wireframe.md 1번). 로그인 성공 시 pet.name 유무로
-// 펫 이름 짓기 화면 또는 목록 화면으로 이동한다(회원가입 시에는 실제 로그인까지 이어서 처리해
-// 가입 직후 자동 로그인된 것처럼 동작시킨다 - UC1 include UC2, 4-use-case-diagram.md).
+// 로그인/회원가입 폼(같은 화면에서 전환, 8-wireframe.md 1번). 로그인 성공 시 항상 목록
+// 화면으로 이동한다(회원가입 시에는 실제 로그인까지 이어서 처리해 가입 직후 자동 로그인된
+// 것처럼 동작시킨다 - UC1 include UC2, 4-use-case-diagram.md). pet.name이 아직 없으면
+// 펫 팝업을 처음 열 때 그 안에서 이름을 짓는다(PetPanel.jsx, 사용자 확인) - 로그인 직후
+// 별도 페이지로 강제 이동시키지 않는다.
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin, useSignup } from '../hooks/useAuth';
@@ -21,10 +23,6 @@ function LoginPage() {
       ? signupMutation.error?.response?.data?.error?.message || '회원가입에 실패했습니다.'
       : null;
 
-  function goAfterLogin(pet) {
-    navigate(pet?.name ? '/promotions' : '/pet/name');
-  }
-
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -32,8 +30,8 @@ function LoginPage() {
       if (mode === 'signup') {
         await signupMutation.mutateAsync({ email, password });
       }
-      const loginResult = await loginMutation.mutateAsync({ email, password });
-      goAfterLogin(loginResult.pet);
+      await loginMutation.mutateAsync({ email, password });
+      navigate('/promotions');
     } catch {
       // 실패 시 UI 표시는 loginMutation.isError/signupMutation.isError로 처리한다.
     }
@@ -64,28 +62,32 @@ function LoginPage() {
               required
             />
           </label>
-          <button type="submit" className="pixel-btn pixel-btn-primary" disabled={isSubmitting}>
-            {mode === 'login' ? '로그인' : '회원가입'}
-          </button>
+          {/* 로그인/회원가입 버튼을 한 줄에 두되 라벨/위치는 모드와 무관하게 항상
+              "로그인"이 왼쪽, "회원가입"이 오른쪽으로 고정한다(사용자 확인). 현재 모드에
+              해당하는 쪽만 실제 제출 버튼(주요색)이고, 나머지는 그 모드로 전환하는 버튼. */}
+          <div className="login-actions-row">
+            {mode === 'login' ? (
+              <button type="submit" className="pixel-btn pixel-btn-primary" disabled={isSubmitting}>
+                로그인
+              </button>
+            ) : (
+              <button type="button" className="pixel-btn" onClick={() => setMode('login')}>
+                로그인
+              </button>
+            )}
+            {mode === 'signup' ? (
+              <button type="submit" className="pixel-btn pixel-btn-primary" disabled={isSubmitting}>
+                회원가입
+              </button>
+            ) : (
+              <button type="button" className="pixel-btn" onClick={() => setMode('signup')}>
+                회원가입
+              </button>
+            )}
+          </div>
         </form>
 
         {errorMessage && <p role="alert">{errorMessage}</p>}
-
-        {mode === 'login' ? (
-          <p>
-            아직 계정이 없으신가요?{' '}
-            <button type="button" className="pixel-btn" onClick={() => setMode('signup')}>
-              회원가입
-            </button>
-          </p>
-        ) : (
-          <p>
-            이미 계정이 있으신가요?{' '}
-            <button type="button" className="pixel-btn" onClick={() => setMode('login')}>
-              로그인
-            </button>
-          </p>
-        )}
       </div>
     </div>
   );

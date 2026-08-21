@@ -268,6 +268,13 @@ a {
   margin-bottom: var(--space-2);
 }
 
+/* 로그인/회원가입 버튼을 한 줄에 좌우로 배치(사용자 확인). */
+.login-actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 /* input은 대체 요소(replaced element)라 ::before/::after 생성 콘텐츠를 지원하지 않아
    위의 이중 레이어 트릭을 쓸 수 없다. 노치 대신 단순 사각형 + 살짝만 둥근 처리로 대신한다. */
 .pixel-input {

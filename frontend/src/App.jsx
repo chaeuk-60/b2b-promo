@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
-import PetNamePage from './pages/PetNamePage';
 import PromotionListPage from './pages/PromotionListPage';
 import PromotionDetailPage from './pages/PromotionDetailPage';
 import MyApplicationsPage from './pages/MyApplicationsPage';
@@ -12,8 +11,9 @@ import { refresh } from './api/auth.api';
 import { setAccessToken } from './api/client';
 import useAuthStore from './store/auth.store';
 
-// 로그인/이름짓기 화면은 아직 목록·펫으로 이동할 이유가 없어 공통 네비게이션을 씌우지
-// 않는다(10-plan.md FE-10, 8-wireframe.md 3번 네비게이션은 로그인 이후 화면 기준).
+// 로그인 화면은 아직 목록·펫으로 이동할 이유가 없어 공통 네비게이션을 씌우지 않는다
+// (10-plan.md FE-10, 8-wireframe.md 3번 네비게이션은 로그인 이후 화면 기준). 펫 이름
+// 짓기는 별도 라우트가 아니라 펫 팝업(PetPanel.jsx) 안에서 처리한다(FE-3).
 function withLayout(element) {
   return <Layout>{element}</Layout>;
 }
@@ -49,7 +49,6 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<LoginPage />} />
-      <Route path="/pet/name" element={<PetNamePage />} />
       <Route path="/promotions" element={withLayout(<PromotionListPage />)} />
       <Route path="/promotions/:id" element={withLayout(<PromotionDetailPage />)} />
       <Route path="/my-applications" element={withLayout(<MyApplicationsPage />)} />

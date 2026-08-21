@@ -131,18 +131,18 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
 
 ### FE-2. 인증 화면 및 상태
 - `frontend/src/api/auth.api.js`, `frontend/src/hooks/useAuth.js`(TanStack Query), `frontend/src/store/auth.store.js`(Zustand, 로그인 사용자 정보만).
-- `frontend/src/pages/LoginPage.jsx`: 이메일/비밀번호 입력, 로그인/회원가입 폼 전환(같은 화면), 로그인 성공 시 최초 로그인 여부에 따라 펫 이름 짓기 화면 또는 목록 화면으로 이동(`8-wireframe.md` 1번).
+- `frontend/src/pages/LoginPage.jsx`: 이메일/비밀번호 입력, 로그인/회원가입 폼 전환(같은 화면), 로그인 성공 시 항상 목록 화면으로 이동한다(`8-wireframe.md` 1번). 이름 짓기는 FE-3 참고 - 로그인 화면이 직접 분기하지 않는다(사용자 확인).
 - 선행: BE-2, FE-1
 - 완료 조건:
-  - [x] 회원가입 후 자동 로그인되고 목록 화면 또는 이름 짓기 화면으로 이동한다.
+  - [x] 회원가입 후 자동 로그인되고 목록 화면으로 이동한다.
   - [x] 로그인 성공 시 Zustand 스토어에 사용자 정보가 채워지고, 실패 시 에러 메시지가 표시된다.
 
-### FE-3. 펫 이름 짓기 화면
-- `frontend/src/pages/`에 이름 짓기 화면(선택 입력 + 건너뛰기/확인 버튼, `8-wireframe.md` 2번)을 만들고, 최초 로그인/사망 후 새 알/성체 순환 후 새 알 상황에서 노출되도록 연결한다.
+### FE-3. 펫 이름 짓기 (펫 팝업)
+- `frontend/src/components/pet/PetPanel.jsx`에 이름 짓기 폼(선택 입력 + 건너뛰기/확인 버튼, `8-wireframe.md` 2번)을 만들고, pet.name이 없을 때 펫 팝업을 열면 평소 펫 화면 대신 노출되도록 연결한다(별도 페이지/라우팅 없음 - 사용자 확인: "펫 이름 짓기를 펫 팝업 처음으로 뜰때 하게 해"). 최초 로그인/사망 후 새 알/성체 순환 후 새 알 상황 모두 pet.name이 비어있는 것으로 판별되므로 조건 분기가 따로 필요 없다.
 - 선행: BE-5, FE-2
 - 완료 조건:
-  - [x] 이름을 입력하고 확인하면 펫 이름이 반영된 상태로 목록 화면으로 이동한다.
-  - [x] 건너뛰기를 누르면 기본 이름으로 목록 화면으로 이동한다.
+  - [x] 이름을 입력하고 확인하면 그 자리에서 바로 평소 펫 화면으로 바뀐다.
+  - [x] 건너뛰기를 누르면 기본 이름으로 평소 펫 화면으로 바뀐다.
 
 ### FE-4. 프로모션 목록 화면
 - `frontend/src/api/promotion.api.js`, `frontend/src/hooks/usePromotions.js`(목록 useQuery), `frontend/src/hooks/useToggleFavorite.js`(useMutation).

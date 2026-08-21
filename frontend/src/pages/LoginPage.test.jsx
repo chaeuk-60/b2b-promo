@@ -1,4 +1,5 @@
-// FE-2: 로그인/회원가입 폼 제출 -> pet.name 유무에 따라 이동, 실패 시 에러 메시지 표시.
+// FE-2: 로그인/회원가입 폼 제출 -> 항상 프로모션 목록으로 이동(이름 짓기는 펫 팝업에서
+// 처리, FE-3), 실패 시 에러 메시지 표시.
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
@@ -19,7 +20,6 @@ function renderLoginPage() {
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<LoginPage />} />
-          <Route path="/pet/name" element={<div>펫 이름 짓기</div>} />
           <Route path="/promotions" element={<div>프로모션 목록</div>} />
         </Routes>
       </MemoryRouter>
@@ -32,7 +32,7 @@ describe('LoginPage', () => {
     vi.clearAllMocks();
   });
 
-  it('로그인 성공 시 pet.name이 없으면 펫 이름 짓기 화면으로 이동한다', async () => {
+  it('로그인 성공 시 pet.name이 없어도 프로모션 목록 화면으로 이동한다(이름 짓기는 펫 팝업에서)', async () => {
     login.mockResolvedValue({
       accessToken: 'token',
       user: { id: 1, email: 'a@example.com' },
@@ -44,7 +44,7 @@ describe('LoginPage', () => {
     fireEvent.change(screen.getByLabelText('비밀번호'), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: '로그인' }));
 
-    await waitFor(() => expect(screen.getByText('펫 이름 짓기')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('프로모션 목록')).toBeInTheDocument());
   });
 
   it('로그인 성공 시 pet.name이 있으면 프로모션 목록 화면으로 이동한다', async () => {
@@ -93,7 +93,7 @@ describe('LoginPage', () => {
     fireEvent.change(screen.getByLabelText('비밀번호'), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: '회원가입' }));
 
-    await waitFor(() => expect(screen.getByText('펫 이름 짓기')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('프로모션 목록')).toBeInTheDocument());
     expect(signup).toHaveBeenCalled();
     expect(signup.mock.calls[0][0]).toEqual({ email: 'b@example.com', password: 'password123' });
     expect(login).toHaveBeenCalled();

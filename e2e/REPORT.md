@@ -55,7 +55,7 @@
 
 ## 3. 발견된 결함
 
-### 3.1 회원가입 실패 시, 로그인 폼의 이전 에러 메시지가 남아 잘못된 안내를 띄움 (재현 확실)
+### 3.1 회원가입 실패 시, 로그인 폼의 이전 에러 메시지가 남아 잘못된 안내를 띄움 (재현 확실) — ✅ 수정 완료(2026-08-21)
 
 - **위치**: `frontend/src/pages/LoginPage.jsx`의 `errorMessage` 계산 로직
 - **재현 절차**:
@@ -64,7 +64,7 @@
 - **기대 동작**: 백엔드가 내려주는 회원가입 전용 에러(`EMAIL_TAKEN`, "이미 가입된 이메일입니다.")가 표시되어야 함
 - **실제 동작**: 네트워크 탭에서는 `POST /auth/signup → 400 {"error":{"code":"EMAIL_TAKEN","message":"이미 가입된 이메일입니다."}}`가 정확히 내려오지만, 화면에는 1단계에서 남아있던 로그인 에러 문구가 그대로 표시됨(`edge-02` 스크린샷)
 - **원인**: `errorMessage`가 `loginMutation.isError`를 `signupMutation.isError`보다 무조건 먼저 확인하며, 두 `useMutation` 상태 모두 모드 전환 시 리셋되지 않아 이전 실패 상태가 계속 남아있음
-- **제안 수정**: 모드(`mode`)가 바뀔 때 `loginMutation.reset()`/`signupMutation.reset()` 호출, 그리고 `errorMessage`를 "현재 `mode`에 해당하는 mutation의 에러만" 보도록 수정
+- **수정 내용**: 모드 전환 함수(`switchMode`)에서 `loginMutation.reset()`/`signupMutation.reset()`을 호출해 이전 실패 상태를 지운다. 수정 과정에서 실제로 재현해보니, 두 버튼(로그인/회원가입)이 같은 자리에서 `type="submit"`/`type="button"`을 서로 바꿔가며 렌더링되던 구조 때문에 React가 같은 DOM 버튼 엘리먼트의 `type` 속성만 바꿔치기했고, 클릭이 끝나기 전에 type이 button→submit으로 바뀌면서 모드 전환 클릭 자체가 의도치 않게 폼을 제출해버리는 2차 버그도 함께 발견해 고쳤다(각 버튼에 `key`를 줘서 완전히 다른 엘리먼트로 취급되게 함). `frontend/src/pages/LoginPage.test.jsx`에 회귀 테스트 추가.
 
 ### 3.2 관리자 계정도 페이지를 새로고침하면(또는 URL 직접 이동) 관리자 페이지에 접근할 수 없음 (재현 확실, 심각도 높음)
 

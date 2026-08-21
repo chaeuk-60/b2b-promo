@@ -23,6 +23,15 @@ function LoginPage() {
       ? signupMutation.error?.response?.data?.error?.message || '회원가입에 실패했습니다.'
       : null;
 
+  // 버그: 로그인 실패 후 회원가입 모드로 바꿔 다시 제출하면, 방금 실패한 회원가입 에러가
+  // 아니라 이전 로그인 실패 메시지가 계속 표시됐다(loginMutation.isError가 리셋 안 되고
+  // 남아있어 항상 우선 표시됨). 모드를 바꿀 때 두 mutation 상태를 모두 리셋해서 고친다.
+  function switchMode(nextMode) {
+    loginMutation.reset();
+    signupMutation.reset();
+    setMode(nextMode);
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
@@ -66,21 +75,45 @@ function LoginPage() {
               "로그인"이 왼쪽, "회원가입"이 오른쪽으로 고정한다(사용자 확인). 현재 모드에
               해당하는 쪽만 실제 제출 버튼(주요색)이고, 나머지는 그 모드로 전환하는 버튼. */}
           <div className="login-actions-row">
+            {/* key로 submit/button 버튼을 서로 다른 요소로 강제한다 - 같은 자리라 React가
+                기존 DOM 버튼의 type 속성만 바꿔치기하면, 클릭이 끝나기 전에 type이
+                button -> submit으로 바뀌어 의도치 않게 폼이 제출되는 브라우저 동작이 있다
+                (버그: "회원가입"으로 전환만 했는데 곧바로 제출까지 되던 문제). */}
             {mode === 'login' ? (
-              <button type="submit" className="pixel-btn pixel-btn-primary" disabled={isSubmitting}>
+              <button
+                key="login-submit"
+                type="submit"
+                className="pixel-btn pixel-btn-primary"
+                disabled={isSubmitting}
+              >
                 로그인
               </button>
             ) : (
-              <button type="button" className="pixel-btn" onClick={() => setMode('login')}>
+              <button
+                key="login-toggle"
+                type="button"
+                className="pixel-btn"
+                onClick={() => switchMode('login')}
+              >
                 로그인
               </button>
             )}
             {mode === 'signup' ? (
-              <button type="submit" className="pixel-btn pixel-btn-primary" disabled={isSubmitting}>
+              <button
+                key="signup-submit"
+                type="submit"
+                className="pixel-btn pixel-btn-primary"
+                disabled={isSubmitting}
+              >
                 회원가입
               </button>
             ) : (
-              <button type="button" className="pixel-btn" onClick={() => setMode('signup')}>
+              <button
+                key="signup-toggle"
+                type="button"
+                className="pixel-btn"
+                onClick={() => switchMode('signup')}
+              >
                 회원가입
               </button>
             )}

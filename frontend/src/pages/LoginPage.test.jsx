@@ -99,4 +99,33 @@ describe('LoginPage', () => {
     expect(login).toHaveBeenCalled();
     expect(login.mock.calls[0][0]).toEqual({ email: 'b@example.com', password: 'password123' });
   });
+
+  // 버그 수정: 로그인 실패 후 회원가입으로 전환해 다시 실패하면, 이전 로그인 에러가 아니라
+  // 방금 실패한 회원가입 에러가 표시돼야 한다(모드 전환 시 mutation 상태 리셋).
+  it('로그인 실패 후 회원가입으로 전환해 실패하면 이전 로그인 에러가 아니라 회원가입 에러가 표시된다', async () => {
+    login.mockRejectedValue({
+      response: { data: { error: { message: '이메일 또는 비밀번호가 올바르지 않습니다.' } } },
+    });
+    signup.mockRejectedValue({
+      response: { data: { error: { message: '이미 가입된 이메일입니다.' } } },
+    });
+    renderLoginPage();
+
+    fireEvent.change(screen.getByLabelText('이메일'), { target: { value: 'a@example.com' } });
+    fireEvent.change(screen.getByLabelText('비밀번호'), { target: { value: 'wrong' } });
+    fireEvent.click(screen.getByRole('button', { name: '로그인' }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        '이메일 또는 비밀번호가 올바르지 않습니다.'
+      )
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '회원가입' }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '회원가입' }));
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent('이미 가입된 이메일입니다.')
+    );
+  });
 });

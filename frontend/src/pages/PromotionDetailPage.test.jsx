@@ -69,7 +69,7 @@ describe('PromotionDetailPage', () => {
     renderDetail();
 
     expect(await screen.findByText('신청 완료')).toBeInTheDocument();
-    expect(screen.getByText('취소는 담당자에게 연락 주세요')).toBeInTheDocument();
+    expect(screen.getByText('※ 취소는 담당자에게 연락 주세요')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '신청하기' })).not.toBeInTheDocument();
   });
 
@@ -79,7 +79,7 @@ describe('PromotionDetailPage', () => {
 
     const disabledButton = await screen.findByRole('button', { name: '기간 종료' });
     expect(disabledButton).toBeDisabled();
-    expect(screen.getByText('담당자에게 연락 주세요')).toBeInTheDocument();
+    expect(screen.getByText('※ 담당자에게 연락 주세요')).toBeInTheDocument();
   });
 
   it('상세 조회 실패 시 에러 문구가 표시된다', async () => {

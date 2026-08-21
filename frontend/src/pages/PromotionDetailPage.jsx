@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { usePromotion } from '../hooks/usePromotion';
 import { useApplyPromotion } from '../hooks/useApplyPromotion';
 import FavoriteButton from '../components/promotion/FavoriteButton';
+import { foodEmoji } from '../utils/foodEmoji';
 
 function isEnded(endDate) {
   return new Date(endDate) < new Date(new Date().toDateString());
@@ -20,11 +21,14 @@ function PromotionDetailPage() {
 
   return (
     <div>
-      <Link to="/promotions">{'< 목록으로'}</Link>
+      <Link className="back-link" to="/promotions">
+        {'< 목록으로'}
+      </Link>
       <div className="pixel-card">
         {/* 나의 신청 목록 카드와 같은 톤으로(사용자 확인: 제목표시줄 없이 일반 제목).
             목록과 같은 형광펜 하이라이트 + 파란색 대신 일반 잉크색(사용자 확인). */}
         <h2 className="promo-card-title">
+          {foodEmoji(promotion.special_food_id)}{' '}
           <span className="promo-card-title-highlight">{promotion.title}</span>
         </h2>
         <p>
@@ -54,8 +58,8 @@ function PromotionDetailPage() {
           )}
           <FavoriteButton promotionId={promotion.id} favorited={promotion.favorited} />
         </div>
-        {promotion.applied && <p>취소는 담당자에게 연락 주세요</p>}
-        {ended && !promotion.applied && <p>담당자에게 연락 주세요</p>}
+        {promotion.applied && <p className="promo-card-note">※ 취소는 담당자에게 연락 주세요</p>}
+        {ended && !promotion.applied && <p className="promo-card-note">※ 담당자에게 연락 주세요</p>}
         {applyPromotion.isError && <p role="alert">신청에 실패했습니다.</p>}
       </div>
     </div>

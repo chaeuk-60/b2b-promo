@@ -1,6 +1,6 @@
 // 나의 신청 목록 화면(8-wireframe.md 5번): 신청한 프로모션 카드(제목/신청일/기간),
 // 취소 버튼은 없고 안내 문구만 표시(도메인 정의서 - 신청 취소 미제공).
-import { Link } from 'react-router-dom';
+// "< 목록으로" 링크는 없다 - 상단 네비게이션의 "프로모션 목록" 탭과 중복이라 뺀다(사용자 확인).
 import { useMyApplications } from '../hooks/useMyApplications';
 import { foodEmoji } from '../utils/foodEmoji';
 
@@ -12,7 +12,6 @@ function MyApplicationsPage() {
 
   return (
     <div>
-      <Link to="/promotions">{'< 목록으로'}</Link>
       <h2>나의 신청 목록</h2>
       {applications.length === 0 ? (
         <p>아직 신청한 프로모션이 없습니다.</p>
@@ -26,7 +25,7 @@ function MyApplicationsPage() {
             <p>
               기간: {application.start_date} ~ {application.end_date}
             </p>
-            <p>취소는 담당자에게 연락 주세요</p>
+            <p className="promo-card-note">※ 취소는 담당자에게 연락 주세요</p>
           </div>
         ))
       )}

@@ -68,7 +68,7 @@ describe('PromotionCard', () => {
 
     const applyButton = screen.getByRole('button', { name: '기간 종료' });
     expect(applyButton).toBeDisabled();
-    expect(screen.getByText('담당자에게 연락 주세요')).toBeInTheDocument();
+    expect(screen.getByText('※ 담당자에게 연락 주세요')).toBeInTheDocument();
   });
 
   it('기간 내이고 신청 전이면 신청하기 링크가 표시된다', () => {

@@ -253,6 +253,21 @@ a {
   background: linear-gradient(180deg, transparent 55%, #fff3a0 55%);
 }
 
+/* "취소/기간종료 안내"는 본문보다 작게, 당구장 표시(※)를 붙여 각주처럼 보이게 한다
+   (사용자 확인). */
+.promo-card-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: var(--space-1);
+}
+
+/* "< 목록으로" 뒤 카드가 바로 붙어 답답해 보이던 것 방지(pixel-card는 margin-top이
+   없어서 앞 요소와 간격이 안 생겼음 - 사용자 확인). */
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--space-2);
+}
+
 /* input은 대체 요소(replaced element)라 ::before/::after 생성 콘텐츠를 지원하지 않아
    위의 이중 레이어 트릭을 쓸 수 없다. 노치 대신 단순 사각형 + 살짝만 둥근 처리로 대신한다. */
 .pixel-input {

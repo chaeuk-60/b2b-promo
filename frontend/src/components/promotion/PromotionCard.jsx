@@ -45,7 +45,7 @@ function PromotionCard({ promotion }) {
         )}
         <FavoriteButton promotionId={promotion.id} favorited={promotion.favorited} />
       </div>
-      {ended && !promotion.applied && <p>담당자에게 연락 주세요</p>}
+      {ended && !promotion.applied && <p className="promo-card-note">※ 담당자에게 연락 주세요</p>}
     </div>
   );
 }

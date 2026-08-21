@@ -56,7 +56,7 @@ describe('MyApplicationsPage', () => {
     ]);
     renderPage();
 
-    expect(await screen.findByText('취소는 담당자에게 연락 주세요')).toBeInTheDocument();
+    expect(await screen.findByText('※ 취소는 담당자에게 연락 주세요')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /취소/ })).not.toBeInTheDocument();
   });
 

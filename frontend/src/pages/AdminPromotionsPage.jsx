@@ -57,7 +57,9 @@ function AdminPromotionsPage() {
 
   return (
     <div>
-      <Link to="/promotions">{'< 프로모션 목록'}</Link>
+      <Link className="back-link" to="/promotions">
+        {'< 프로모션 목록'}
+      </Link>
       <h2>프로모션 등록/수정</h2>
 
       <div className="pixel-card">

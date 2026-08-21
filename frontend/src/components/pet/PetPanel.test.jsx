@@ -36,7 +36,7 @@ describe('PetPanel', () => {
     listMyApplications.mockResolvedValue([]);
     renderPanel();
 
-    expect(await screen.findByText('김커푸(평범)')).toBeInTheDocument();
+    expect(await screen.findByText('김커푸')).toBeInTheDocument();
   });
 
   it('펫 조회 실패 시 에러 문구가 표시된다', async () => {
@@ -53,7 +53,7 @@ describe('PetPanel', () => {
     patPet.mockResolvedValue({});
     renderPanel();
 
-    await screen.findByText('김커푸(평범 Mood)');
+    await screen.findByText('김커푸');
     fireEvent.click(screen.getByRole('button', { name: '쓰다듬기' }));
 
     await waitFor(() => expect(screen.getByText('❤️ 완전 좋아요~')).toBeInTheDocument());

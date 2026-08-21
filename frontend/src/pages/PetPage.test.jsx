@@ -39,6 +39,6 @@ describe('PetPage', () => {
       'href',
       '/promotions'
     );
-    expect(await screen.findByText('김커푸(평범)')).toBeInTheDocument();
+    expect(await screen.findByText('김커푸')).toBeInTheDocument();
   });
 });

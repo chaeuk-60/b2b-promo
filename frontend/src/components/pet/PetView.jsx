@@ -1,4 +1,6 @@
-// 펫 상태 표시(8-wireframe.md 6번): 이름/상태 + 초원 배경 안 스프라이트 + 일상 대사 말풍선.
+// 펫 상태 표시(8-wireframe.md 6번): 이름 + 초원 배경 안 스프라이트 + 일상 대사 말풍선.
+// 이름 옆 상태(mood/eggState) 텍스트는 뺀다(사용자 확인) - 상태는 스프라이트 표정/오버레이와
+// 말풍선 대사로만 드러낸다.
 // stage/mood/eggState 조합에 따라 분기 렌더하는 하나의 컴포넌트로 유지한다(잘게 쪼개지 않음,
 // 10-plan.md FE-7). 좌우로 총총 걸어다니는 모션/통통 튀는 모션은 docs/mockups/
 // pet-screen-mockup.html의 애니메이션을 그대로 이식했다(스타일은 12-style.md 픽셀 테마로 대체).
@@ -108,9 +110,7 @@ function PetView({ pet, reaction }) {
     const bubbleText = reaction ? reaction.emoji : ambientEgg;
     return (
       <div>
-        <p className="pet-name-status">
-          {pet.name}({pet.egg_state})
-        </p>
+        <p className="pet-name-status">{pet.name}</p>
         <div className="pet-scene">
           {/* 다리가 없어 좌우로 돌아다니지 못하고 제자리에서 흔들리는 idle 모션만 가진다.
               말풍선을 펫과 같이 묶어서 펫이 말하는 것처럼 보이게 한다(길면 줄바꿈). */}
@@ -140,9 +140,7 @@ function PetView({ pet, reaction }) {
 
   return (
     <div>
-      <p className="pet-name-status">
-        {pet.name}({pet.mood} Mood)
-      </p>
+      <p className="pet-name-status">{pet.name}</p>
       <div className={`pet-scene${isSpotlight ? ' pet-scene-spotlight' : ''}`}>
         {/* 말풍선을 pet-wander 안에 같이 둬서 펫을 따라다니게 한다(길면 줄바꿈해서 씬
             밖으로 삐져나가지 않게 함). 운세(spotlight)일 때는 펫도 가운데로 멈춰 세운다. */}

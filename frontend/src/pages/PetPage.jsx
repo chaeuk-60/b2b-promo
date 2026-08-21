@@ -7,7 +7,9 @@ import PetPanel from '../components/pet/PetPanel';
 function PetPage() {
   return (
     <div>
-      <Link to="/promotions">{'< 프로모션 목록'}</Link>
+      <Link className="back-link" to="/promotions">
+        {'< 프로모션 목록'}
+      </Link>
       <PetPanel />
     </div>
   );

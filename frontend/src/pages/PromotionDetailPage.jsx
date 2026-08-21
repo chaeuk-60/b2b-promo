@@ -22,37 +22,39 @@ function PromotionDetailPage() {
     <div>
       <Link to="/promotions">{'< 목록으로'}</Link>
       <div className="pixel-card">
-        <h2>{promotion.title}</h2>
+        {/* 창 제목표시줄(pixel-titlebar) - 프로모션 카드/펫 팝업과 같은 톤으로 통일. */}
+        <div className="pixel-titlebar">
+          <h2 className="pixel-titlebar-title">{promotion.title}</h2>
+        </div>
         <p>
           기간: {promotion.start_date} ~ {promotion.end_date}
         </p>
-        <FavoriteButton promotionId={promotion.id} favorited={promotion.favorited} />
         <p>{promotion.content}</p>
 
-        {promotion.applied ? (
-          <>
+        {/* 찜은 신청 상태 버튼 오른쪽에 나란히(사용자 확인: "찜버튼 신청하기 옆에 있어야지"). */}
+        <div className="promo-card-actions">
+          {promotion.applied ? (
             <button type="button" className="pixel-btn pixel-btn-done" disabled>
               신청 완료
             </button>
-            <p>취소는 담당자에게 연락 주세요</p>
-          </>
-        ) : ended ? (
-          <>
+          ) : ended ? (
             <button type="button" className="pixel-btn" disabled>
               기간 종료
             </button>
-            <p>담당자에게 연락 주세요</p>
-          </>
-        ) : (
-          <button
-            type="button"
-            className="pixel-btn pixel-btn-primary"
-            onClick={() => applyPromotion.mutate()}
-            disabled={applyPromotion.isPending}
-          >
-            신청하기
-          </button>
-        )}
+          ) : (
+            <button
+              type="button"
+              className="pixel-btn pixel-btn-primary"
+              onClick={() => applyPromotion.mutate()}
+              disabled={applyPromotion.isPending}
+            >
+              신청하기
+            </button>
+          )}
+          <FavoriteButton promotionId={promotion.id} favorited={promotion.favorited} />
+        </div>
+        {promotion.applied && <p>취소는 담당자에게 연락 주세요</p>}
+        {ended && !promotion.applied && <p>담당자에게 연락 주세요</p>}
         {applyPromotion.isError && <p role="alert">신청에 실패했습니다.</p>}
       </div>
     </div>

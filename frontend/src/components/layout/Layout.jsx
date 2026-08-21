@@ -3,7 +3,7 @@
 // 동작한다 - 어느 화면에서든 우상단 버튼으로 펫을 열고 닫을 수 있어야 한다는 요구사항 반영
 // (원래 와이어프레임은 "펫 화면으로 이동"이었으나 팝업으로 대체).
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import PetPanel from '../pet/PetPanel';
 import { usePet } from '../../hooks/usePet';
 import { bodySpriteUrl, eggSpriteUrl, TOMBSTONE_SPRITE_URL } from '../../utils/petSprite';
@@ -25,13 +25,21 @@ function Layout({ children }) {
 
   return (
     <div>
+      {/* 상단 탭(레퍼런스: Y2K/레트로 OS 탭바) - 버튼과 같은 pixel-btn 모양을 그대로 써서
+          통일감을 주고, 현재 페이지 탭만 brand-blue로 눌린 듯 강조한다. */}
       <nav className="app-nav">
-        <Link to="/promotions">
+        <NavLink
+          to="/promotions"
+          className={({ isActive }) => `pixel-btn${isActive ? ' pixel-tab-active' : ''}`}
+        >
           📋 <span className="app-nav-label">프로모션 목록</span>
-        </Link>
-        <Link to="/my-applications">
+        </NavLink>
+        <NavLink
+          to="/my-applications"
+          className={({ isActive }) => `pixel-btn${isActive ? ' pixel-tab-active' : ''}`}
+        >
           📄 <span className="app-nav-label">나의 신청 목록</span>
-        </Link>
+        </NavLink>
         <button
           type="button"
           className="pixel-btn app-nav-pet-toggle"
@@ -59,12 +67,12 @@ function Layout({ children }) {
       {showPetPopup && (
         <div className="pet-popup-overlay" onClick={() => setShowPetPopup(false)}>
           <div className="pet-popup pixel-card" onClick={(e) => e.stopPropagation()}>
-            {/* 창 제목표시줄(레퍼런스: Y2K/레트로 데스크톱 팝업창의 색깔 타이틀바 +
-                우상단 컨트롤 사각버튼) - 닫기 버튼을 그 안의 컨트롤 버튼으로 배치한다. */}
-            <div className="pet-popup-titlebar">
+            {/* 창 제목표시줄(pixel-titlebar - 프로모션 카드/상세와 공통, index.css 참고) -
+                닫기 버튼을 그 안의 컨트롤 버튼으로 배치한다. */}
+            <div className="pixel-titlebar">
               <button
                 type="button"
-                className="pet-popup-close"
+                className="pixel-titlebar-btn pixel-titlebar-btn-close"
                 aria-label="닫기"
                 onClick={() => setShowPetPopup(false)}
               >

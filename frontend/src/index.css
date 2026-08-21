@@ -1,4 +1,8 @@
 /* 전역 디자인 토큰 + 공통 컴포넌트 클래스 (docs/12-style.md 레트로 픽셀아트 가이드) */
+/* 실제 도트(픽셀) 폰트 Galmuri(SIL OFL, 한글 지원) - npm 패키지를 jsDelivr CDN으로 로드.
+   @import는 다른 규칙보다 앞에 와야 해서 파일 맨 위에 둔다. */
+@import url('https://cdn.jsdelivr.net/npm/galmuri/dist/galmuri.css');
+
 :root {
   --bg-sky-top: #bfe8f5;
   --bg-sky-bottom: #f3c9e0;
@@ -15,8 +19,8 @@
   --space-3: 24px;
   --space-4: 32px;
 
-  /* 도트 폰트 라이선스/로딩 이슈를 피해 모노스페이스로 픽셀 느낌만 낸다(12-style.md 참조 - 웹폰트는 스킵) */
-  --font-pixel: 'Courier New', ui-monospace, Consolas, monospace;
+  /* Galmuri11(도트 폰트, 한글 지원) - 로딩 실패 시에도 모노스페이스로 픽셀 느낌은 유지되게 폴백 */
+  --font-pixel: 'Galmuri11', 'Courier New', ui-monospace, Consolas, monospace;
 
   /* 둥근 border-radius 대신 네 모서리를 2단 계단형으로 잘라내는 "픽셀 노치" 모양
      (카드/버튼 공통). 계단을 1단만 주면 그냥 대각선 모서리처럼 보여서 2단으로 구성한다:
@@ -151,6 +155,8 @@ a {
   align-items: center;
   justify-content: center;
   min-height: 40px;
+  min-width: 88px; /* 글자 길이에 따라 버튼 폭이 들쭉날쭉해지지 않게 최소 폭 고정(사용자 확인) -
+    이보다 긴 글자만 자연스럽게 늘어난다 */
   border: none; /* <button>/<a> 기본 UA 테두리 제거(이제 border는 ::before 레이어로 대체) */
   clip-path: var(--pixel-corners-btn);
   padding: 0 20px;
@@ -222,6 +228,18 @@ a {
   color: var(--paper);
 }
 
+/* 프로모션 카드/상세: 신청 상태 버튼 + 찜 버튼을 한 줄에 나란히(찜은 신청 버튼 오른쪽). */
+.promo-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.promo-card-actions .pixel-btn + .pixel-btn {
+  margin-left: 0; /* gap이 간격을 담당하므로 중복 마진 제거 */
+}
+
 /* input은 대체 요소(replaced element)라 ::before/::after 생성 콘텐츠를 지원하지 않아
    위의 이중 레이어 트릭을 쓸 수 없다. 노치 대신 단순 사각형 + 살짝만 둥근 처리로 대신한다. */
 .pixel-input {
@@ -269,6 +287,15 @@ a {
   color: var(--ink);
 }
 
+/* 현재 페이지 탭 강조 - 제목표시줄과 같은 brand-blue로 "눌려서 열려있는 탭" 느낌을 낸다. */
+.pixel-tab-active::before {
+  background: var(--brand-blue);
+}
+
+.pixel-tab-active {
+  color: var(--paper);
+}
+
 .app-nav-pet-toggle {
   margin-left: auto; /* "펫 보기"는 우측 정렬 */
 }
@@ -306,35 +333,70 @@ a {
   overflow-x: hidden; /* 말풍선이 길 때 pet-wander(절대 위치)가 팝업 밖으로 삐져나가 가로 스크롤이 생기는 것 방지 */
 }
 
-/* 창 제목표시줄: 카드 안쪽 흰 배경 맨 위에 색깔 바를 가장자리까지 꽉 채운다(카드
-   패딩만큼 음수 마진으로 밀어냄). 우상단 컨트롤 버튼(닫기)만 올려서 레퍼런스의
-   Y2K 데스크톱 창 느낌을 낸다. */
-.pet-popup-titlebar {
+/* 창 제목표시줄(레퍼런스: Y2K/레트로 데스크톱 창): pixel-card 안쪽 흰 배경 맨 위에
+   색깔 바를 가장자리까지 꽉 채운다(카드 패딩만큼 음수 마진으로 밀어냄). 펫 팝업뿐
+   아니라 프로모션 카드/상세에도 그대로 써서 앱 전체가 "레트로 창 여러 개가 떠 있는"
+   하나의 톤으로 보이게 한다(사용자 확인: "펫 팝업이랑 통일성도 없잖아"). */
+.pixel-titlebar {
   margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) var(--space-2);
-  padding: var(--space-2);
+  padding: 6px var(--space-2);
   background: var(--brand-blue);
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: flex-end; /* 제목 없이 컨트롤 버튼만 있는 경우(펫 팝업) 기본값 */
+  gap: var(--space-2);
 }
 
-/* 닫기(X) 버튼: 레퍼런스의 컬러 사각 컨트롤 버튼 스타일(핑크 배경 + 흰 ×, 하드 섀도우). */
-.pet-popup-close {
+.pixel-titlebar:has(.pixel-titlebar-title) {
+  justify-content: space-between; /* 제목이 있으면 좌측 제목 + 우측 컨트롤로 배치 */
+}
+
+.pixel-titlebar-title {
+  color: var(--paper);
+  text-shadow: none; /* h1/h2 전역 규칙의 흰 아웃라인 그림자를 지운다 - 흰 글자에 흰 그림자면 안 보임 */
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+}
+
+a.pixel-titlebar-title {
+  color: var(--paper); /* app-nav a 규칙(--ink)보다 우선해야 해서 태그 결합 선택자로 명시 */
+}
+
+/* 제목표시줄 우측 컨트롤 버튼(닫기 ×, 찜 하트 등) 공통 - 레퍼런스의 컬러 사각
+   컨트롤 버튼 스타일(하드 섀도우 + 눌리는 애니메이션). */
+.pixel-titlebar-btn {
   min-height: 0;
   width: 24px;
   height: 24px;
   padding: 0;
+  flex-shrink: 0;
   border: 2px solid var(--ink);
-  background: var(--accent-pink);
-  color: var(--paper);
-  font-size: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 13px;
   line-height: 1;
   cursor: pointer;
   box-shadow: 2px 2px 0 var(--ink);
 }
 
-.pet-popup-close:active {
+.pixel-titlebar-btn:active:not(:disabled) {
   box-shadow: none;
   transform: translate(2px, 2px);
+}
+
+.pixel-titlebar-btn-close {
+  background: var(--accent-pink);
+  color: var(--paper);
+}
+
+.pixel-titlebar-btn[aria-pressed='true'] {
+  background: var(--accent-pink);
+  color: var(--paper);
 }
 
 .pet-name-status {

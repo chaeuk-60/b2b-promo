@@ -63,8 +63,15 @@
           "title": { "type": "string" },
           "start_date": { "type": "string", "format": "date" },
           "end_date": { "type": "string", "format": "date" },
-          "content": { "type": "string" },
-          "special_food_id": { "type": "string" },
+          "content": { "type": "string", "description": "목록 카드에 표시되는 간단 내용" },
+          "detail_content": {
+            "type": "string",
+            "description": "상세 화면 전용 내용. 비어있으면 프론트가 content를 대신 보여준다"
+          },
+          "special_food_id": {
+            "type": "string",
+            "description": "이 프로모션의 특식을 나타내는 이모지(관리자가 직접 입력)"
+          },
           "favorited": {
             "type": "boolean",
             "description": "요청한 사용자가 이 프로모션을 찜했는지 여부(목록/상세 조회에서만 포함됨)"
@@ -334,8 +341,12 @@
                   "title": { "type": "string" },
                   "start_date": { "type": "string", "format": "date" },
                   "end_date": { "type": "string", "format": "date" },
-                  "content": { "type": "string" },
-                  "special_food_id": { "type": "string" }
+                  "content": { "type": "string", "description": "목록 카드에 표시되는 간단 내용" },
+                  "detail_content": {
+                    "type": "string",
+                    "description": "상세 화면 전용 내용(선택, 비우면 content로 대체 표시)"
+                  },
+                  "special_food_id": { "type": "string", "description": "특식 이모지" }
                 }
               }
             }
@@ -386,8 +397,12 @@
                   "title": { "type": "string" },
                   "start_date": { "type": "string", "format": "date" },
                   "end_date": { "type": "string", "format": "date" },
-                  "content": { "type": "string" },
-                  "special_food_id": { "type": "string" }
+                  "content": { "type": "string", "description": "목록 카드에 표시되는 간단 내용" },
+                  "detail_content": {
+                    "type": "string",
+                    "description": "상세 화면 전용 내용(선택, 비우면 content로 대체 표시)"
+                  },
+                  "special_food_id": { "type": "string", "description": "특식 이모지" }
                 }
               }
             }

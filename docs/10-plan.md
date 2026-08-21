@@ -68,7 +68,7 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
   - [x] 관리자가 아닌 사용자가 등록/수정 API를 호출하면 403이 반환된다(BE-4에서 실제 `POST/PUT /promotions` 라우트에 `requireAdmin`을 적용, `promotion.test.js`로 검증 완료).
 
 ### BE-4. 프로모션 도메인 (목록/상세/등록·수정/신청/찜)
-- `backend/src/services/promotion.service.js`: 목록/상세 조회, 등록/수정(관리자, title/기간/content/specialFoodId), 신청(기간 내 검증, 중복 신청은 DB UNIQUE로 처리 후 에러 매핑), 찜 토글.
+- `backend/src/services/promotion.service.js`: 목록/상세 조회, 등록/수정(관리자, title/기간/content/detailContent/specialFoodId), 신청(기간 내 검증, 중복 신청은 DB UNIQUE로 처리 후 에러 매핑), 찜 토글.
 - 신청 처리는 `pool.connect()` + `BEGIN/COMMIT/ROLLBACK` 트랜잭션으로 감싼다(신청 레코드 생성이 곧 특식 보유 판정 기준이 되므로 별도 보유 테이블은 만들지 않는다 — 보유 특식 목록은 `applications JOIN promotions`로 조회).
 - `backend/src/controllers/promotion.controller.js`, `backend/src/routes/promotion.routes.js` 작성.
 - 선행: BE-2, BE-3
@@ -186,7 +186,7 @@ Task 총 21개: DB 3개, BE 8개, FE 10개.
   - [x] 오늘의 운세 버튼은 알 단계에서 비활성/미노출이고, 새끼/성체에서만 결과가 표시된다.
 
 ### FE-9. 관리자 프로모션 등록/수정 화면
-- 와이어프레임 문서에는 없으나 PRD 3.1·5.2절 범위인 관리자 CRUD를 위한 최소 폼 화면을 추가한다(별도 관리자 레이아웃 없이, 관리자 계정으로 로그인 시에만 노출되는 페이지 1개: 제목/기간/내용/특식 입력 + 등록/수정 목록).
+- 와이어프레임 문서에는 없으나 PRD 3.1·5.2절 범위인 관리자 CRUD를 위한 최소 폼 화면을 추가한다(별도 관리자 레이아웃 없이, 관리자 계정으로 로그인 시에만 상단 네비에 링크가 노출되는 페이지 1개: 제목/기간/간단 내용/상세 내용/특식 이모지 입력 + 등록/수정 목록).
 - 새 컴포넌트 체계나 별도 관리자 레이아웃은 만들지 않고 기존 페이지 구조에 페이지 1개만 추가한다.
 - 선행: BE-3, BE-4, FE-2
 - 완료 조건:

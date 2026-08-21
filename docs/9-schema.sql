@@ -26,8 +26,9 @@ CREATE TABLE promotions (
     title            TEXT NOT NULL,
     start_date       DATE NOT NULL,
     end_date         DATE NOT NULL,
-    content          TEXT NOT NULL,
-    special_food_id  TEXT NOT NULL -- 이 프로모션의 특식 식별자(도메인 정의서상 별도 엔티티 없음, 프로모션당 1개)
+    content          TEXT NOT NULL, -- 목록 카드에 보이는 간단 요약(사용자 확인: 목록/상세 내용을 다르게)
+    detail_content   TEXT NOT NULL DEFAULT '', -- 상세 화면 전용 내용. 비어있으면 프론트가 content로 대체 표시
+    special_food_id  TEXT NOT NULL -- 이 프로모션의 특식을 나타내는 이모지(관리자가 직접 입력, 사용자 확인)
 );
 
 CREATE TABLE applications (

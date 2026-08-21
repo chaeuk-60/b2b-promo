@@ -1,11 +1,6 @@
-// 도메인 정의서에 specialFoodId <-> 이모지 매핑이 정의되어 있지 않아, 문자열을 해시해서
-// 고정된 이모지 하나를 결정적으로 골라준다(같은 특식은 항상 같은 이모지, 시각적 구분용).
-// 프로모션 카드(FE-4)와 나의 신청 목록(FE-6)에서 공통으로 쓴다.
-const FOOD_EMOJIS = ['🍖', '🍰', '🍜', '🍎', '🍕', '🍩', '🍇', '🍓'];
-
+// 특식 ID는 관리자가 프로모션 등록/수정 화면에서 직접 입력한 이모지 그 자체다(사용자 확인:
+// "특식ID는 그냥 입력한 이모지 쓸수 있게, 랜덤 말고" - 이전엔 문자열을 해시해서 8개 후보 중
+// 하나를 결정적으로 골라줬는데, 그 간접 매핑을 없애고 입력값을 그대로 보여준다).
 export function foodEmoji(specialFoodId) {
-  if (!specialFoodId) return '🍖';
-  let hash = 0;
-  for (const ch of specialFoodId) hash = (hash * 31 + ch.charCodeAt(0)) % FOOD_EMOJIS.length;
-  return FOOD_EMOJIS[hash];
+  return specialFoodId || '🍖';
 }

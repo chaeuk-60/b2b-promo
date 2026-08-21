@@ -65,8 +65,13 @@ describe('AdminPromotionsPage', () => {
     fireEvent.change(screen.getByLabelText('제목'), { target: { value: '신규 프로모션' } });
     fireEvent.change(screen.getByLabelText('시작일'), { target: { value: '2026-09-01' } });
     fireEvent.change(screen.getByLabelText('종료일'), { target: { value: '2026-09-30' } });
-    fireEvent.change(screen.getByLabelText('내용'), { target: { value: '신규 내용' } });
-    fireEvent.change(screen.getByLabelText('특식 ID'), { target: { value: 'new-food' } });
+    fireEvent.change(screen.getByLabelText('간단 내용(목록에 표시)'), {
+      target: { value: '신규 내용' },
+    });
+    fireEvent.change(screen.getByLabelText('상세 내용(상세 화면에 표시)'), {
+      target: { value: '신규 상세 내용' },
+    });
+    fireEvent.change(screen.getByLabelText('특식 이모지'), { target: { value: '🍰' } });
     fireEvent.click(screen.getByRole('button', { name: '등록' }));
 
     await waitFor(() => expect(createPromotion).toHaveBeenCalled());
@@ -75,7 +80,8 @@ describe('AdminPromotionsPage', () => {
       start_date: '2026-09-01',
       end_date: '2026-09-30',
       content: '신규 내용',
-      special_food_id: 'new-food',
+      detail_content: '신규 상세 내용',
+      special_food_id: '🍰',
     });
   });
 
@@ -88,7 +94,8 @@ describe('AdminPromotionsPage', () => {
         start_date: '2026-08-01',
         end_date: '2026-08-31',
         content: '내용',
-        special_food_id: 'rice-cake',
+        detail_content: '상세 내용',
+        special_food_id: '🍚',
       },
     ]);
     updatePromotion.mockResolvedValue({ id: 5 });
@@ -105,7 +112,8 @@ describe('AdminPromotionsPage', () => {
       start_date: '2026-08-01',
       end_date: '2026-08-31',
       content: '내용',
-      special_food_id: 'rice-cake',
+      detail_content: '상세 내용',
+      special_food_id: '🍚',
     });
   });
 });

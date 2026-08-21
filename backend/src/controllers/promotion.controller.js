@@ -32,12 +32,13 @@ async function getOne(req, res, next) {
 
 async function create(req, res, next) {
   try {
-    const { title, start_date, end_date, content, special_food_id } = req.body;
+    const { title, start_date, end_date, content, detail_content, special_food_id } = req.body;
     const promotion = await promotionService.createPromotion({
       title,
       start_date,
       end_date,
       content,
+      detail_content,
       special_food_id,
     });
     res.status(201).json(promotion);

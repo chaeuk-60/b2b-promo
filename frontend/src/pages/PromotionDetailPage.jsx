@@ -34,7 +34,9 @@ function PromotionDetailPage() {
         <p>
           기간: {promotion.start_date} ~ {promotion.end_date}
         </p>
-        <p>{promotion.content}</p>
+        {/* 상세 화면은 목록 카드보다 자세한 내용을 보여준다(사용자 확인). detail_content가
+            비어있으면(관리자가 안 채운 기존 데이터 포함) 간단 내용으로 대체한다. */}
+        <p>{promotion.detail_content || promotion.content}</p>
 
         {/* 찜은 신청 상태 버튼 오른쪽에 나란히(사용자 확인: "찜버튼 신청하기 옆에 있어야지"). */}
         <div className="promo-card-actions">

@@ -33,28 +33,36 @@ async function getPromotionForUser(promotionId, userId) {
   return rows[0] || null;
 }
 
-async function createPromotion({ title, start_date, end_date, content, special_food_id }) {
+async function createPromotion({
+  title,
+  start_date,
+  end_date,
+  content,
+  detail_content,
+  special_food_id,
+}) {
   const { rows } = await pool.query(
-    `INSERT INTO promotions (title, start_date, end_date, content, special_food_id)
-     VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO promotions (title, start_date, end_date, content, detail_content, special_food_id)
+     VALUES ($1, $2, $3, $4, $5, $6)
      RETURNING *`,
-    [title, start_date, end_date, content, special_food_id]
+    [title, start_date, end_date, content, detail_content || '', special_food_id]
   );
   return rows[0];
 }
 
 async function updatePromotion(promotionId, fields) {
-  const { title, start_date, end_date, content, special_food_id } = fields;
+  const { title, start_date, end_date, content, detail_content, special_food_id } = fields;
   const { rows } = await pool.query(
     `UPDATE promotions
      SET title = COALESCE($1, title),
          start_date = COALESCE($2, start_date),
          end_date = COALESCE($3, end_date),
          content = COALESCE($4, content),
-         special_food_id = COALESCE($5, special_food_id)
-     WHERE id = $6
+         detail_content = COALESCE($5, detail_content),
+         special_food_id = COALESCE($6, special_food_id)
+     WHERE id = $7
      RETURNING *`,
-    [title, start_date, end_date, content, special_food_id, promotionId]
+    [title, start_date, end_date, content, detail_content, special_food_id, promotionId]
   );
   return rows[0] || null;
 }

@@ -30,8 +30,9 @@ erDiagram
         string title
         date startDate
         date endDate
-        text content
-        ID specialFoodId "이 프로모션의 특식(펫 아이템)"
+        text content "목록 카드에 보이는 간단 내용"
+        text detailContent "상세 화면 전용 내용(선택, 비어있으면 content로 대체)"
+        string specialFoodId "이 프로모션의 특식 이모지(관리자가 직접 입력)"
     }
 
     APPLICATION {

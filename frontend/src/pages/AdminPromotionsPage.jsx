@@ -9,7 +9,14 @@ import { useCreatePromotion, useUpdatePromotion } from '../hooks/useAdminPromoti
 
 const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'admin@b2b-promo.com';
 
-const EMPTY_FORM = { title: '', start_date: '', end_date: '', content: '', special_food_id: '' };
+const EMPTY_FORM = {
+  title: '',
+  start_date: '',
+  end_date: '',
+  content: '',
+  detail_content: '',
+  special_food_id: '',
+};
 
 function AdminPromotionsPage() {
   const user = useAuthStore((state) => state.user);
@@ -32,6 +39,7 @@ function AdminPromotionsPage() {
       start_date: promotion.start_date,
       end_date: promotion.end_date,
       content: promotion.content,
+      detail_content: promotion.detail_content || '',
       special_food_id: promotion.special_food_id,
     });
   }
@@ -94,7 +102,7 @@ function AdminPromotionsPage() {
             />
           </label>
           <label className="pixel-field">
-            <span className="pixel-field-label">내용</span>
+            <span className="pixel-field-label">간단 내용(목록에 표시)</span>
             <input
               className="pixel-input"
               value={form.content}
@@ -103,11 +111,21 @@ function AdminPromotionsPage() {
             />
           </label>
           <label className="pixel-field">
-            <span className="pixel-field-label">특식 ID</span>
+            <span className="pixel-field-label">상세 내용(상세 화면에 표시)</span>
+            <input
+              className="pixel-input"
+              value={form.detail_content}
+              onChange={(e) => setForm({ ...form, detail_content: e.target.value })}
+              placeholder="비워두면 간단 내용을 그대로 보여줍니다"
+            />
+          </label>
+          <label className="pixel-field">
+            <span className="pixel-field-label">특식 이모지</span>
             <input
               className="pixel-input"
               value={form.special_food_id}
               onChange={(e) => setForm({ ...form, special_food_id: e.target.value })}
+              placeholder="예: 🍖"
               required
             />
           </label>

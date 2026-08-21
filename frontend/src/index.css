@@ -76,17 +76,11 @@
 body {
   margin: 0;
   min-height: 100svh;
-  /* 부드러운 CSS 그라데이션 대신 색상 띠를 6단으로 딱딱 끊어서 픽셀로 찍은 것처럼
-     보이게 한다(--bg-sky-top ~ --bg-sky-bottom을 6단계로 선형 보간한 색). */
-  background: linear-gradient(
-    180deg,
-    #bfe8f5 0% 16.66%,
-    #c9e2f1 16.66% 33.33%,
-    #d4dced 33.33% 50%,
-    #ded5e8 50% 66.66%,
-    #e9cfe4 66.66% 83.33%,
-    #f3c9e0 83.33% 100%
-  );
+  /* Y2K/레트로퓨처 픽셀 그라데이션: 6단 색상 띠 대신, 60x34 격자에 칸마다 색을 찍고
+     밝기를 살짝 흔든(디더링) SVG를 배경으로 깐다(스크립트로 생성, 시드 고정이라 매번
+     같은 결과 - frontend/public/images/app-bg.svg). 사용자 제공 레퍼런스 이미지의
+     민트/시안(위) -> 옐로/골드(중간) -> 핑크/마젠타(아래) 대각선 색 흐름을 따른다. */
+  background: url('/images/app-bg.svg') center / cover fixed;
   font-family: var(--font-pixel);
   color: var(--ink);
 }
@@ -312,17 +306,35 @@ a {
   overflow-x: hidden; /* 말풍선이 길 때 pet-wander(절대 위치)가 팝업 밖으로 삐져나가 가로 스크롤이 생기는 것 방지 */
 }
 
-/* 닫기(X) 버튼: 이름 표시줄과 같은 높이의 우상단에 정사각형으로 둔다. */
+/* 창 제목표시줄: 카드 안쪽 흰 배경 맨 위에 색깔 바를 가장자리까지 꽉 채운다(카드
+   패딩만큼 음수 마진으로 밀어냄). 우상단 컨트롤 버튼(닫기)만 올려서 레퍼런스의
+   Y2K 데스크톱 창 느낌을 낸다. */
+.pet-popup-titlebar {
+  margin: calc(-1 * var(--space-2)) calc(-1 * var(--space-2)) var(--space-2);
+  padding: var(--space-2);
+  background: var(--brand-blue);
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* 닫기(X) 버튼: 레퍼런스의 컬러 사각 컨트롤 버튼 스타일(핑크 배경 + 흰 ×, 하드 섀도우). */
 .pet-popup-close {
-  position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
   min-height: 0;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   padding: 0;
-  font-size: 16px;
+  border: 2px solid var(--ink);
+  background: var(--accent-pink);
+  color: var(--paper);
+  font-size: 14px;
   line-height: 1;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 var(--ink);
+}
+
+.pet-popup-close:active {
+  box-shadow: none;
+  transform: translate(2px, 2px);
 }
 
 .pet-name-status {
@@ -361,11 +373,28 @@ a {
   max-width: 200px;
   background: var(--paper);
   border: 2px solid var(--ink);
-  border-radius: 8px;
   padding: 4px 10px;
   font-size: 13px;
   white-space: normal;
   text-align: center;
+  /* 둥근 말풍선 대신 각진 픽셀 말풍선(레퍼런스: 두꺼운 테두리 + 하드 섀도우 + 계단형
+     꼬리) - border-radius 0으로 12-style.md의 "네모네모" 원칙을 여기도 지킨다. */
+  box-shadow: 3px 3px 0 var(--ink);
+}
+
+/* 계단형 꼬리: 작은 사각형 한 칸을 아래로 내밀어 픽셀 말풍선 특유의 뾰족하지 않고
+   뚝뚝 끊긴 꼬리를 낸다(레퍼런스 참고). */
+.pet-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 8px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-top: none;
 }
 
 /* 운세처럼 문장이 길 때는 좁게 여러 줄로 감싸면 씬 높이를 넘어가 배경 밖으로 삐져나간다.

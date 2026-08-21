@@ -59,14 +59,18 @@ function Layout({ children }) {
       {showPetPopup && (
         <div className="pet-popup-overlay" onClick={() => setShowPetPopup(false)}>
           <div className="pet-popup pixel-card" onClick={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="pixel-btn pet-popup-close"
-              aria-label="닫기"
-              onClick={() => setShowPetPopup(false)}
-            >
-              ×
-            </button>
+            {/* 창 제목표시줄(레퍼런스: Y2K/레트로 데스크톱 팝업창의 색깔 타이틀바 +
+                우상단 컨트롤 사각버튼) - 닫기 버튼을 그 안의 컨트롤 버튼으로 배치한다. */}
+            <div className="pet-popup-titlebar">
+              <button
+                type="button"
+                className="pet-popup-close"
+                aria-label="닫기"
+                onClick={() => setShowPetPopup(false)}
+              >
+                ×
+              </button>
+            </div>
             <PetPanel />
           </div>
         </div>
